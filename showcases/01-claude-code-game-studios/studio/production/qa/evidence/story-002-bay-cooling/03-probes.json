@@ -1,0 +1,11 @@
+{
+  "run": "node scripts/inspect.mjs showcases/01-claude-code-game-studios/ --steps s002.json (1440x900 and 390x844)",
+  "date": "2026-10-19T22:52-03:00",
+  "frostGrowth_30s": {"before": [0.2186, 0.0881, 0.1338], "after": [0.5494, 0.3453, 0.4373]},
+  "clearCoolersHold": {"tempsAfter30s": [-18.003, -18.004, -18.001]},
+  "icedCoolerToThawLine_s": 25.22,
+  "scrape": {"fullClear_s": 1.83, "frostHalfSecondAfterReset0.8": 0.525, "frostOneSecondAfterRelease": 0.536},
+  "workAwayFromStation": {"x": 260, "frostBay1_0.5_after1s": 0.5086, "working": null},
+  "spaceHeld900msAtIcedBayB": {"frostAfter": 0.4968},
+  "consoleErrors": 0
+}

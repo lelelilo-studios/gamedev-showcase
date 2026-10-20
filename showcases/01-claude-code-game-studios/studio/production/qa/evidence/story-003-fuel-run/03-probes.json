@@ -1,0 +1,13 @@
+{
+  "run": "node scripts/inspect.mjs showcases/01-claude-code-game-studios/ --steps s003.json (1440x900 and 390x844)",
+  "date": "2026-10-19T22:55-03:00",
+  "fuelToZero": {"gen": {"fuel": 0, "running": false}, "bayTempsAtZero": [-17.694, -17.704, -17.612], "bayTemps10sLater": [-14.694, -14.704, -14.612]},
+  "pickupAtShed_hold700ms": {"carrying": true},
+  "walk1s": {"withCan": 108, "without": 150},
+  "pour_hold1100ms_from30": {"fuel": 69.45, "carrying": false, "cans": 1},
+  "warmth2s": {"outsideFrom100": 86, "tunnelFrom50": 56, "generatorHallFrom50": 74},
+  "collapse": {"at": {"collapsed": true, "carrying": false, "collapses": 1}, "after3500ms": {"collapsed": false, "x": 254, "floor": 0, "warmth": 45.5}},
+  "leftAlone": {"dryAt_s": 117, "nightLength_s": 216},
+  "twoCansAt95sAnd170s": {"lowestFuel": 10.5, "neverDry": true, "cans": 2},
+  "consoleErrors": 0
+}

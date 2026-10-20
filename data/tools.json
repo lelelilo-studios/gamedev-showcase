@@ -1,0 +1,208 @@
+{
+  "snapshot": "2026-10-16",
+  "categories": [
+    { "id": "skills", "name": "Agent skills", "blurb": "Skill packs that make a coding agent work like a game team." },
+    { "id": "physics", "name": "Physics, destruction & fire", "blurb": "Bodies that stack, crockery that shatters and fire that spreads." },
+    { "id": "worlds", "name": "Worlds, AI & pipeline", "blurb": "Navigation, procedural maps, level geometry and level of detail." },
+    { "id": "story", "name": "Story", "blurb": "Branching narrative written as a script." }
+  ],
+  "tools": [
+    {
+      "no": "01",
+      "slug": "01-claude-code-game-studios",
+      "tool": "Claude Code Game Studios",
+      "kind": "skill pack",
+      "category": "skills",
+      "repo": "Donchitos/Claude-Code-Game-Studios",
+      "stars": 26726,
+      "license": "MIT",
+      "skill_ref": "05ad7c8a5b8aa2aa86bbd3439ae7cf7295cac418",
+      "why": "Turns one Claude Code session into a game studio: 49 agents from creative director to QA tester, 72 workflow skills, gates and templates. Its lightest mode goes from a one-page brief to a running game.",
+      "install": [
+        { "label": "Clone it as your new project", "cmd": "git clone https://github.com/Donchitos/Claude-Code-Game-Studios.git my-game\ncd my-game\nclaude" },
+        { "label": "then, inside Claude Code", "cmd": "/start" }
+      ],
+      "caveats": [
+        "Built for Godot, Unity and Unreal projects; this showcase uses its workflow with no engine (a plain web page), which is a departure.",
+        "Its hooks need Bash, Python 3 and ideally jq; one hook checks GitHub for updates (it can be turned off in /settings).",
+        "The heavier rigor levels write many documents before code; the README itself measures that the lightest level made the better game."
+      ]
+    },
+    {
+      "no": "02",
+      "slug": "02-mengto-game-skills",
+      "tool": "MengTo game-development skills",
+      "kind": "skill pack",
+      "category": "skills",
+      "repo": "MengTo/Skills",
+      "stars": 6802,
+      "license": "MIT",
+      "skill_ref": "398cd41c86ba42fbb30e944ae507f463648f08b7",
+      "skill_paths": ["agent-skills/game-development", "agent-skills/game-combat"],
+      "why": "Meng To's skills for playable three.js games: an isometric action-RPG loop built in vertical slices, camera, enemy AI, combat timing, readable VFX, audio cues, mobile controls and real-browser testing.",
+      "install": [
+        { "label": "Copy the skill folders you need into your project", "cmd": "git clone https://github.com/MengTo/Skills.git\nmkdir -p .claude/skills\ncp -r Skills/agent-skills/game-development/* .claude/skills/" },
+        { "label": "then ask Claude Code", "cmd": "Use build-isometric-arpg to build …" }
+      ],
+      "caveats": [
+        "The README's own setup notes say install instructions for Claude Code are still to come; copying the SKILL.md folders works.",
+        "Some skills assume generated or rigged 3D assets; this showcase uses procedural meshes only."
+      ]
+    },
+    {
+      "no": "03",
+      "slug": "03-joltphysics",
+      "tool": "JoltPhysics",
+      "kind": "library",
+      "category": "physics",
+      "repo": "jrouwe/JoltPhysics",
+      "lib_repo": "jrouwe/JoltPhysics.js",
+      "stars": 11745,
+      "license": "MIT",
+      "why": "The rigid-body physics engine inside Horizon Forbidden West and Death Stranding 2, built for many threads. Its official WebAssembly port brings the same bodies, constraints and buoyancy to the browser.",
+      "install": [
+        { "label": "npm (the official WebAssembly port)", "cmd": "npm install jolt-physics" },
+        { "label": "then", "cmd": "import initJolt from 'jolt-physics';\nconst Jolt = await initJolt();" }
+      ],
+      "caveats": [
+        "The browser build is the separate JoltPhysics.js repo by the same author; its API mirrors the C++ one, and objects you create with new must be freed with Jolt.destroy()."
+      ]
+    },
+    {
+      "no": "04",
+      "slug": "04-three-pinata",
+      "tool": "three-piñata",
+      "kind": "library",
+      "category": "physics",
+      "repo": "dgreenheck/three-pinata",
+      "homepage": "https://three-pinata-demo.vercel.app/",
+      "stars": 448,
+      "stars_note": "from GitHub on 2026-10-19 (the wiki has no snapshot for it)",
+      "license": "MIT",
+      "why": "Dan Greenheck's real-time mesh fracturing and slicing for three.js: Voronoi fractures concentrated around the impact, refracturing, plane slicing and separate materials for the broken insides.",
+      "install": [
+        { "label": "npm", "cmd": "npm install @dgreenheck/three-pinata" }
+      ],
+      "caveats": [
+        "It breaks meshes but doesn't move the pieces; pair it with a physics engine (this page uses Rapier).",
+        "Fracturing many fragments at once costs a frame or two; cap the count on phones."
+      ]
+    },
+    {
+      "no": "05",
+      "slug": "05-fire-pro",
+      "tool": "Fire Pro",
+      "kind": "library",
+      "category": "physics",
+      "repo": "dgreenheck/threejs-fire-pro",
+      "homepage": "https://dgreenheck.github.io/threejs-fire-pro/",
+      "stars": 56,
+      "license": "MIT",
+      "why": "Volumetric fire, smoke and explosions for three.js, simulated as a sparse fluid on the GPU and ray-marched, with emitters, forces, colliders and a visual editor that exports effects.",
+      "install": [
+        { "label": "npm (needs the exact three.js peer)", "cmd": "npm install threejs-fire-pro three@0.185.1" },
+        { "label": "or design an effect first in the hosted editor", "cmd": "https://dgreenheck.github.io/threejs-fire-pro/" }
+      ],
+      "caveats": [
+        "WebGPU only: no WebGL fallback, and it's heavy on the GPU.",
+        "Very new (created September 2026, version 0.1.0); read the README's Limitations section."
+      ]
+    },
+    {
+      "no": "06",
+      "slug": "06-recastnavigation",
+      "tool": "recastnavigation",
+      "kind": "library",
+      "category": "worlds",
+      "repo": "recastnavigation/recastnavigation",
+      "lib_repo": "isaac-mason/recast-navigation-js",
+      "homepage": "http://recastnav.com/",
+      "stars": 7967,
+      "license": "Zlib",
+      "why": "The industry-standard navmesh toolset behind the AI navigation in Unity, Unreal and Godot: Recast builds the mesh from level geometry, Detour finds paths, and DetourCrowd steers whole crowds around each other.",
+      "install": [
+        { "label": "npm (the WebAssembly port, recast-navigation-js)", "cmd": "npm install recast-navigation @recast-navigation/three three" }
+      ],
+      "caveats": [
+        "The browser build is a community port (isaac-mason/recast-navigation-js, MIT) of the C++ library.",
+        "The C++ repo has had no pushes since February 2026; it's mature rather than abandoned."
+      ]
+    },
+    {
+      "no": "07",
+      "slug": "07-wavefunctioncollapse",
+      "tool": "wavefunctioncollapse",
+      "kind": "library",
+      "category": "worlds",
+      "repo": "kchapelier/wavefunctioncollapse",
+      "stars": 526,
+      "license": "MIT",
+      "why": "A JavaScript port of mxgmn's WaveFunctionCollapse: learn the local patterns of a small sample, or the adjacency rules of a tile set, and grow whole maps that obey them.",
+      "install": [
+        { "label": "npm", "cmd": "npm install wavefunctioncollapse --production" }
+      ],
+      "caveats": [
+        "Quiet since August 2023, and CommonJS only; load it through esm.sh in the browser.",
+        "Generation can hit a contradiction; retry with a new seed (this page shows the retries)."
+      ]
+    },
+    {
+      "no": "08",
+      "slug": "08-manifold",
+      "tool": "manifold",
+      "kind": "library",
+      "category": "worlds",
+      "repo": "elalish/manifold",
+      "homepage": "https://manifoldcad.org/",
+      "stars": 2356,
+      "license": "Apache-2.0",
+      "why": "A geometry library whose booleans always return solid, watertight meshes, fast enough to run live. Its WebAssembly build makes add-and-subtract level building possible in a browser.",
+      "install": [
+        { "label": "npm", "cmd": "npm install manifold-3d" },
+        { "label": "then", "cmd": "import Module from 'manifold-3d';\nconst wasm = await Module();\nwasm.setup();\nconst { Manifold } = wasm;" }
+      ],
+      "caveats": [
+        "Manifold objects live in WebAssembly memory; call delete() on the ones you no longer need."
+      ]
+    },
+    {
+      "no": "09",
+      "slug": "09-meshoptimizer",
+      "tool": "meshoptimizer",
+      "kind": "library",
+      "category": "worlds",
+      "repo": "zeux/meshoptimizer",
+      "homepage": "https://meshoptimizer.org/",
+      "stars": 8579,
+      "license": "MIT",
+      "why": "Arseny Kapoulkine's mesh optimisation library: simplification for LOD chains, vertex cache and overdraw ordering, and compression, with a JavaScript build and the gltfpack tool.",
+      "install": [
+        { "label": "npm (the JavaScript build)", "cmd": "npm install meshoptimizer" },
+        { "label": "or optimise glTF files from the command line", "cmd": "npx gltfpack -i scene.glb -o scene.min.glb -cc -si 0.5" }
+      ],
+      "caveats": [
+        "The JavaScript build covers simplification, clustering, encoding and decoding; some C++ algorithms are not exposed."
+      ]
+    },
+    {
+      "no": "10",
+      "slug": "10-inkjs",
+      "tool": "inkjs",
+      "kind": "library",
+      "category": "story",
+      "repo": "y-lohse/inkjs",
+      "homepage": "https://www.inklestudios.com/ink/",
+      "stars": 658,
+      "license": "MIT",
+      "why": "A zero-dependency JavaScript port of inkle's ink, the narrative scripting language behind 80 Days and Heaven's Vault, with a compiler that runs in the browser.",
+      "install": [
+        { "label": "npm", "cmd": "npm install inkjs" },
+        { "label": "or a script tag (runtime and compiler)", "cmd": "<script src=\"https://cdn.jsdelivr.net/npm/inkjs@2.4.0/dist/ink-full.js\"></script>" }
+      ],
+      "caveats": [
+        "A few API differences from the C# runtime and compiler, listed in the README.",
+        "Write the story in Inky (inkle's free editor) for a real project; this page compiles ink in the browser."
+      ]
+    }
+  ]
+}

@@ -1,0 +1,524 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Patchwork Isles</title>
+<meta name="description" content="Paint a twelve-square scrap of fabric, let WaveFunctionCollapse sew it into a whole sea chart, then sail a cloth boat to every harbour before the season turns.">
+<meta property="og:title" content="Patchwork Isles">
+<meta property="og:description" content="Stitch a sea chart from a scrap of cloth, then sail it before the season turns.">
+<meta property="og:image" content="../../thumbs/07-wavefunctioncollapse.webp">
+<meta property="og:type" content="website">
+<meta name="theme-color" content="#2c4766">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%232c4766'/%3E%3Crect x='3' y='3' width='13' height='13' fill='%237fb0b8'/%3E%3Crect x='16' y='16' width='13' height='13' fill='%23e6c88e'/%3E%3Crect x='16' y='3' width='13' height='13' fill='%23a3b56b'/%3E%3Cpath d='M5 26 L12 19 M5 19 L12 26' stroke='%23b23a2b' stroke-width='2.6' stroke-linecap='round'/%3E%3Crect x='3.5' y='3.5' width='25' height='25' rx='2' fill='none' stroke='%23efe6d3' stroke-width='1.2' stroke-dasharray='2.4 1.8'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Alegreya:ital,wght@0,400;0,500;0,700;1,400;1,500&family=Special+Elite&display=swap" rel="stylesheet">
+<script type="importmap">{ "imports": { "wavefunctioncollapse": "https://esm.sh/wavefunctioncollapse@2.1.0" } }</script>
+<style>
+:root {
+  --linen: #efe6d3; --linen-2: #e4d7bc; --paper: #f8f2e4; --ink: #2b2620; --ink-2: #5d5247; --line: rgba(43,38,32,.2);
+  --madder: #b23a2b; --madder-d: #8e2b20; --mustard: #d4a03c; --indigo: #2c4766; --indigo-d: #1d2f45; --sage: #8fa564; --walnut: #2a211b;
+  --serif: "Alegreya", "Iowan Old Style", Georgia, serif; --type: "Special Elite", "Courier New", monospace;
+  --tag-ink: #2b2620; --tag-paper: rgba(248,242,228,.94); --tag-line: rgba(43,38,32,.22);
+  --gutter: 16px;
+  color-scheme: light;
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; height: 100%; }
+body {
+  font-family: var(--serif); color: var(--ink); font-size: 17px; line-height: 1.45;
+  background-color: var(--linen);
+  background-image:
+    repeating-linear-gradient(0deg, rgba(120,96,60,.05) 0 1px, transparent 1px 3px),
+    repeating-linear-gradient(90deg, rgba(120,96,60,.045) 0 1px, transparent 1px 3px);
+  overflow: hidden; -webkit-font-smoothing: antialiased; -webkit-tap-highlight-color: transparent;
+}
+/* chrome is not text: dragging across it should never paint a blue selection */
+#workroom, #hud, #title .attract, .menu, .seed-row label, .model-switch, .btn, .seg, .swatch, .preset, .tally, .fabric-name, .hud-card { -webkit-user-select: none; user-select: none; }
+input, textarea { -webkit-user-select: text; user-select: text; }
+.sr-only { position: absolute !important; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+button, input { font: inherit; color: inherit; }
+a { color: var(--madder-d); text-underline-offset: 2px; }
+:focus-visible { outline: 3px solid var(--mustard); outline-offset: 2px; border-radius: 4px; }
+
+/* ---------- woven-label buttons ---------- */
+.btn {
+  position: relative; display: inline-flex; align-items: center; justify-content: center; gap: .5em;
+  min-height: 44px; padding: .55em 1.15em; border: 1px solid rgba(43,38,32,.28); border-radius: 5px; cursor: pointer;
+  background: #fbf6ea; font-family: var(--type); font-size: 15px; letter-spacing: .02em; color: var(--ink);
+  box-shadow: 0 1px 0 rgba(255,255,255,.8) inset, 0 2px 0 rgba(43,38,32,.12), 0 6px 14px -10px rgba(43,38,32,.6);
+  transition: transform .12s, box-shadow .12s, background .12s; user-select: none; -webkit-user-select: none; touch-action: manipulation;
+}
+.btn::before { content: ""; position: absolute; inset: 4px; border: 1px dashed currentColor; border-radius: 3px; opacity: .32; pointer-events: none; }
+.btn:hover { transform: translateY(-1px); background: #fffaf0; }
+.btn:active { transform: translateY(1px); box-shadow: 0 1px 0 rgba(43,38,32,.12); }
+.btn[disabled] { opacity: .45; cursor: not-allowed; transform: none; }
+.btn.primary { background: var(--madder); color: #fbf0dc; border-color: var(--madder-d); }
+.btn.primary::before { opacity: .55; }
+.btn.primary:hover { background: #c04230; }
+.btn.indigo { background: var(--indigo); color: #eef2f2; border-color: var(--indigo-d); }
+.btn.indigo:hover { background: #355578; }
+.btn.small { min-height: 36px; padding: .35em .8em; font-size: 14px; }
+.btn.icon { padding: 0; width: 44px; }
+.btn.icon.small { width: 36px; }
+.btn svg { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+.seg { display: inline-flex; border: 1px solid rgba(43,38,32,.28); border-radius: 5px; overflow: hidden; background: #fbf6ea; }
+.seg button { min-height: 38px; min-width: 42px; padding: 0 .7em; border: 0; border-right: 1px dashed rgba(43,38,32,.25); background: transparent; cursor: pointer; font-family: var(--type); font-size: 14px; }
+.seg button:last-child { border-right: 0; }
+.seg button[aria-pressed="true"] { background: var(--indigo); color: #f3f1ea; }
+.seg button:focus-visible { outline-offset: -3px; }
+
+/* ---------- cards ---------- */
+.card { position: relative; background: var(--paper); border-radius: 7px; border: 1px solid rgba(43,38,32,.16);
+  box-shadow: 0 1px 0 #fff inset, 0 22px 50px -28px rgba(30,20,10,.55), 0 2px 0 rgba(43,38,32,.06); }
+.card::before { content: ""; position: absolute; inset: 9px; border: 1.5px dashed rgba(178,58,43,.38); border-radius: 4px; pointer-events: none; }
+.kicker { font-family: var(--type); font-size: 13px; letter-spacing: .08em; text-transform: uppercase; color: var(--madder-d); margin: 0; }
+.typed { font-family: var(--type); }
+
+/* ---------- screens ---------- */
+.screen { position: fixed; inset: 0; overflow: hidden; }
+.screen[hidden], .modal[hidden], [hidden] { display: none !important; }
+#sea { position: fixed; inset: 0; width: 100%; height: 100%; display: block; background: var(--walnut); touch-action: none; }
+
+/* title */
+#title { display: grid; place-items: center; padding: var(--gutter); overflow-y: auto; }
+.title-grid { width: min(1240px, 100%); display: grid; grid-template-columns: minmax(330px, 450px) minmax(0, 1fr); gap: clamp(20px, 3vw, 44px); align-items: center; }
+.title-card { padding: 34px 34px 26px; }
+.stitch-title { display: block; width: 100%; height: auto; margin: 10px 0 6px; }
+.hook { font-size: 21px; font-style: italic; line-height: 1.32; margin: 6px 0 22px; color: var(--ink); }
+.menu { display: flex; gap: 12px; flex-wrap: wrap; }
+.menu .btn.primary { min-width: 9.5em; font-size: 17px; min-height: 50px; }
+.seed-row { display: flex; align-items: center; gap: 8px; margin: 22px 0 4px; flex-wrap: wrap; }
+.seed-row label { font-family: var(--type); font-size: 14px; color: var(--ink-2); }
+.seed-row input { width: 7.2em; min-height: 36px; padding: 0 .6em; border: 1px solid rgba(43,38,32,.3); border-radius: 5px; background: #fffdf7; font-family: var(--type); font-size: 15px; }
+.fine { font-size: 14px; color: var(--ink-2); margin: 4px 0; }
+.credits { font-size: 13px; color: var(--ink-2); margin: 16px 0 0; line-height: 1.4; }
+.attract { margin: 0; display: flex; flex-direction: column; gap: 10px; min-width: 0; }
+.frame { position: relative; border-radius: 4px; padding: 12px; background: var(--madder-d);
+  background-image: repeating-linear-gradient(45deg, rgba(242,195,90,.18) 0 3px, transparent 3px 9px);
+  box-shadow: 0 30px 60px -30px rgba(30,20,10,.7), 0 0 0 1px rgba(0,0,0,.15); }
+.frame::after { content: ""; position: absolute; inset: 5px; border: 1.5px dashed rgba(255,236,200,.7); border-radius: 3px; pointer-events: none; }
+.frame canvas { display: block; margin: 0 auto; background: var(--linen); }
+figcaption { font-family: var(--type); font-size: 13px; color: var(--ink-2); display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+.loadnote { font-family: var(--type); font-size: 14px; color: var(--ink-2); }
+.attract-mode #title { padding: 8px; place-items: center; }
+.attract-mode .title-card { display: none; }
+.attract-mode .title-grid { grid-template-columns: 1fr; width: 100%; }
+.attract-mode .attract { align-items: center; }
+.attract-mode .frame { width: fit-content; max-width: 100%; padding: 8px; }
+.attract-mode figcaption { align-self: stretch; padding: 0 4px; }
+.attract-mode .attract-badge { display: block; }
+.attract-badge { display: none; position: absolute; left: 14px; bottom: 16px; padding: 8px 12px 9px; pointer-events: none; transform: rotate(-2.5deg); transform-origin: left bottom; }
+.attract-badge::before { inset: 4px; }
+.attract-badge canvas { display: block; }
+
+/* workroom */
+#workroom { overflow-y: auto; overflow-x: hidden; }
+.wr { width: min(1320px, 100%); margin: 0 auto; padding: 14px var(--gutter) 28px; }
+.wr-head { display: flex; align-items: center; gap: 12px; min-height: 52px; padding-right: 230px; flex-wrap: wrap; }
+.wr-head .short { display: none; }
+.wr-head h2 { margin: 0; font-size: 26px; font-weight: 700; letter-spacing: .01em; }
+.wr-head .sub { font-family: var(--type); font-size: 14px; color: var(--ink-2); }
+.wr-grid { display: grid; grid-template-columns: 372px minmax(0, 1fr); gap: 20px; margin-top: 10px; align-items: start; }
+.panel { padding: 20px 20px 18px; }
+.panel h3 { margin: 0 0 8px; font-size: 18px; }
+.panel .lede { font-size: 15px; margin: 0 0 12px; color: var(--ink-2); }
+.model-switch { display: grid; grid-template-columns: 1fr 1fr; gap: 0; margin-bottom: 16px; border: 1px solid rgba(43,38,32,.28); border-radius: 6px; overflow: hidden; }
+.model-switch button { border: 0; background: #fbf6ea; padding: 9px 8px 10px; cursor: pointer; text-align: left; line-height: 1.2; min-height: 54px; }
+.model-switch button + button { border-left: 1px dashed rgba(43,38,32,.3); }
+.model-switch b { display: block; font-family: var(--type); font-weight: 400; font-size: 15px; }
+.model-switch span { font-size: 13px; color: var(--ink-2); }
+.model-switch button[aria-pressed="true"] { background: var(--indigo); color: #f4f1e8; }
+.model-switch button[aria-pressed="true"] span { color: #c9d4dc; }
+.slate { display: block; width: 100%; height: auto; touch-action: none; cursor: crosshair; border-radius: 4px; }
+.fabrics { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; margin: 12px 0 6px; }
+.swatch { position: relative; aspect-ratio: 1; border: 1px solid rgba(43,38,32,.35); border-radius: 5px; padding: 0; cursor: pointer; overflow: hidden; background: #ddd; min-height: 36px; }
+.swatch canvas { width: 100%; height: 100%; display: block; }
+.swatch .k { position: absolute; left: 3px; top: 2px; font-family: var(--type); font-size: 11px; color: #fff; text-shadow: 0 1px 2px rgba(0,0,0,.7); }
+.swatch[aria-pressed="true"] { outline: 3px solid var(--ink); outline-offset: 2px; }
+.swatch[aria-pressed="true"]::after { content: ""; position: absolute; inset: 3px; border: 1.5px dashed #fff; border-radius: 3px; }
+.fabric-name { font-family: var(--type); font-size: 13px; color: var(--ink-2); min-height: 1.4em; margin: 0 0 10px; }
+.row { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+.presets { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin: 14px 0 2px; }
+.preset { display: grid; grid-template-columns: 40px 1fr; gap: 9px; align-items: center; text-align: left; padding: 5px 8px 5px 5px; border: 1px solid rgba(43,38,32,.25); border-radius: 5px; background: #fbf6ea; cursor: pointer; min-height: 50px; }
+.preset canvas { width: 40px; height: 40px; border-radius: 2px; display: block; }
+.preset b { font-family: var(--type); font-weight: 400; font-size: 13.5px; display: block; line-height: 1.15; }
+.preset span { font-size: 12px; color: var(--ink-2); line-height: 1.2; display: block; }
+.preset[aria-pressed="true"] { border-color: var(--indigo); box-shadow: 0 0 0 2px var(--indigo); }
+.loomset { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 10px; margin: 0 4px 14px; }
+.loomset .lab { font-family: var(--type); font-size: 13.5px; color: var(--ink-2); }
+.loomset .seg + .lab { margin-left: 10px; }
+.adm .loomset .pz { display: none; }
+.pieces { width: 100%; height: auto; display: block; margin: 6px 0 10px; }
+.coasts { display: grid; gap: 8px; margin: 10px 0; }
+.coasts .preset { grid-template-columns: 1fr; min-height: 48px; }
+.chart-frame { padding: 10px; }
+.chart-box { position: relative; }
+.chart-box canvas { display: block; margin: 0 auto; max-width: 100%; }
+.chart-msg { position: absolute; inset: 0; display: grid; place-items: center; padding: 18px; pointer-events: none; }
+.chart-msg .card { max-width: 440px; padding: 22px 24px; pointer-events: auto; }
+.chart-msg h4 { margin: 0 0 6px; font-size: 20px; }
+.chart-msg p { margin: 0 0 6px; font-size: 15px; }
+.tally { display: flex; flex-wrap: wrap; gap: 6px 18px; font-family: var(--type); font-size: 14px; margin: 12px 4px 6px; color: var(--ink-2); }
+.tally b { font-weight: 400; color: var(--ink); }
+.tally .hot b { color: var(--madder-d); }
+.note { margin: 4px 4px 12px; font-size: 16px; min-height: 2.9em; }
+.actions { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+.actions .grow { flex: 1; }
+.actions .btn.big { min-height: 52px; font-size: 17px; padding: .55em 1.4em; }
+
+/* HUD */
+#hud { position: fixed; inset: 0; pointer-events: none; }
+#hud > * { pointer-events: auto; }
+.hud-card { position: absolute; background: rgba(248,242,228,.93); border: 1px solid rgba(43,38,32,.22); border-radius: 7px; box-shadow: 0 10px 26px -16px rgba(0,0,0,.6); }
+.hud-card::before { content: ""; position: absolute; inset: 4px; border: 1px dashed rgba(178,58,43,.35); border-radius: 4px; pointer-events: none; }
+.hud-tl { left: 12px; top: 12px; padding: 10px 14px 10px 10px; display: grid; grid-template-columns: auto auto; gap: 4px 12px; align-items: center; }
+.hud-tl canvas { grid-row: span 3; width: 58px; height: 58px; }
+.hud-day { font-family: var(--type); font-size: 15px; white-space: nowrap; }
+.stores { display: flex; gap: 3px; align-items: center; }
+.stores i { width: 12px; height: 14px; border-radius: 3px 3px 4px 4px; border: 1.2px solid #6b5332; background: linear-gradient(to top, #c9a467 var(--f,100%), transparent var(--f,100%)); display: block; }
+.stores.low i { border-color: var(--madder); }
+.ports { display: flex; gap: 4px; align-items: center; font-family: var(--type); font-size: 13px; }
+.ports i { width: 12px; height: 12px; border-radius: 50%; border: 1.5px solid #8f7c5c; background: #f6eedb; display: block; }
+.ports i.v { background: var(--mustard); border-color: #7a5214; box-shadow: inset 0 0 0 2px #f5d07a; }
+.hud-tr { right: 12px; top: 64px; padding: 8px; display: flex; flex-direction: column; align-items: center; gap: 6px; }
+.hud-tr canvas { width: 84px; height: 84px; }
+.sailtxt { font-family: var(--type); font-size: 13px; text-align: center; line-height: 1.3; width: 132px; }
+.sailtxt small { font-size: 11.5px; color: var(--ink-2); display: block; white-space: nowrap; }
+.hud-btns { display: flex; gap: 6px; }
+.hud-btns .btn { min-height: 38px; width: 38px; }
+.ticker { position: absolute; left: 50%; bottom: 66px; transform: translateX(-50%); max-width: min(640px, calc(100% - 32px)); padding: 10px 18px; text-align: center; font-size: 17px; transition: opacity .4s; }
+.ticker.off { opacity: 0; }
+.hints { position: absolute; left: 12px; bottom: 12px; padding: 8px 14px; font-family: var(--type); font-size: 13px; color: var(--ink-2); }
+.hints kbd { font-family: var(--type); border: 1px solid rgba(43,38,32,.35); border-bottom-width: 2px; border-radius: 3px; padding: 0 4px; background: #fffdf6; color: var(--ink); }
+.touch { display: none; }
+.touchmode .touch { display: block; }
+.touchmode .hints { display: none; }
+.pad { position: absolute; bottom: calc(18px + env(safe-area-inset-bottom)); display: flex; gap: 10px; }
+.pad.left { left: 14px; }
+.pad.right { right: 14px; align-items: center; }
+.pad .btn { width: 66px; height: 66px; min-height: 66px; padding: 0; border-radius: 50%; background: rgba(248,242,228,.95); }
+.pad .btn::before { border-radius: 50%; }
+.pad .btn svg { width: 28px; height: 28px; stroke-width: 2.2; }
+.pad .btn.held { background: var(--mustard); }
+.saillvl { font-family: var(--type); font-size: 12px; writing-mode: horizontal-tb; text-align: center; width: 54px; line-height: 1.1; padding: 6px 4px; border-radius: 6px; background: rgba(248,242,228,.93); border: 1px solid rgba(43,38,32,.22); }
+.touchmode .ticker { bottom: 108px; font-size: 15px; }
+
+/* modals */
+.modal { position: fixed; inset: 0; display: flex; align-items: flex-start; justify-content: center; padding: 60px var(--gutter) var(--gutter); background: rgba(30,24,18,.5); overflow-y: auto; z-index: 50; }
+.modal > .card { margin: auto 0; width: min(640px, 100%); padding: 30px 32px 26px; max-height: none; }
+.how-card { width: min(1000px, 100%) !important; }
+.how-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 6px 34px; }
+.how-card p, .how-card li { font-size: 16px; }
+@media (max-width: 880px) { .how-grid { grid-template-columns: 1fr; } }
+.modal h2 { margin: 0 0 10px; font-size: 30px; line-height: 1.1; }
+.modal h3 { font-size: 18px; margin: 18px 0 6px; }
+.modal p { margin: 0 0 10px; }
+.modal ol { padding-left: 1.3em; margin: 8px 0; }
+.modal li { margin: 0 0 8px; }
+.keys { display: grid; grid-template-columns: auto auto auto; gap: 4px 16px; font-size: 15px; margin: 8px 0; }
+.keys .h { font-family: var(--type); font-size: 12.5px; color: var(--ink-2); text-transform: uppercase; letter-spacing: .06em; }
+.keys kbd { font-family: var(--type); font-size: 13.5px; border: 1px solid rgba(43,38,32,.35); border-bottom-width: 2px; border-radius: 3px; padding: 0 5px; background: #fffdf6; }
+.mrow { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 18px; }
+.toggle { display: flex; align-items: center; gap: 10px; cursor: pointer; font-size: 15.5px; margin: 6px 0; min-height: 36px; }
+.toggle input { width: 22px; height: 22px; accent-color: var(--indigo); }
+.over-card { width: min(760px, 100%) !important; }
+.over-grid { display: grid; grid-template-columns: 1.1fr 1fr; gap: 20px; align-items: start; }
+.over-head { margin-bottom: 10px; }
+.over-head canvas { display: block; max-width: 100%; height: auto; }
+.score { font-family: var(--type); font-size: 44px; line-height: 1; margin: 8px 0 2px; }
+.stats { display: grid; grid-template-columns: 1fr auto; gap: 3px 14px; font-size: 15.5px; margin: 10px 0; }
+.stats dt { color: var(--ink-2); }
+.stats dd { margin: 0; font-family: var(--type); text-align: right; }
+.mini { width: 100%; height: auto; display: block; border-radius: 3px; box-shadow: 0 10px 24px -14px rgba(0,0,0,.6); }
+.chartview .card { width: min(1200px, 100%); padding: 18px; }
+.chartview canvas { width: 100%; height: auto; display: block; }
+.error-card { max-width: 520px; padding: 30px; }
+.toast { position: fixed; left: 50%; top: 18px; transform: translateX(-50%); z-index: 80; padding: 10px 18px; font-family: var(--type); font-size: 14px; background: var(--ink); color: var(--linen); border-radius: 6px; opacity: 0; transition: opacity .25s; pointer-events: none; }
+.toast.on { opacity: 1; }
+
+@media (min-width: 1900px) {
+  .title-grid { width: min(1640px, 100%); grid-template-columns: minmax(380px, 540px) minmax(0, 1fr); }
+  .title-card { padding: 42px 42px 32px; }
+  .hook { font-size: 24px; }
+}
+@media (max-width: 1080px) {
+  .wr-grid { grid-template-columns: 1fr; }
+  .wr-main { order: -1; }
+  .panel-wrap { max-width: 560px; }
+}
+@media (max-width: 880px) {
+  .title-grid { grid-template-columns: 1fr; gap: 16px; }
+  #title { place-items: start center; }
+  .title-card { padding: 24px 22px 20px; }
+  .attract { order: -1; }
+  .hook { font-size: 19px; margin-bottom: 16px; }
+  .over-grid { grid-template-columns: 1fr; }
+}
+@media (max-width: 560px) {
+  body { font-size: 16px; }
+  #title { padding-top: 56px; }
+  .loomset .seg + .lab { margin-left: 0; }
+  .wr { padding-top: 58px; }
+  .wr-head { padding-right: 0; gap: 8px; }
+  .wr-head h2 { font-size: 22px; flex: 1; }
+  .wr-head .sub { flex-basis: 100%; }
+  #wrHow { width: 36px; padding: 0; }
+  .wr-head .long { display: none; }
+  .wr-head .short { display: inline; font-size: 17px; }
+  .loomset { display: grid; grid-template-columns: auto 1fr; justify-items: start; }
+  .modal .card { padding: 24px 20px 20px; }
+  .modal h2 { font-size: 25px; }
+  .hud-tl { padding: 7px 10px 7px 7px; gap: 2px 8px; top: 56px; left: 10px; }
+  .hud-tl canvas { width: 46px; height: 46px; }
+  .hud-day { font-size: 13.5px; }
+  .hud-tr { top: 56px; right: 10px; padding: 6px; }
+  .hud-tr canvas { width: 64px; height: 64px; }
+  .sailtxt { font-size: 12px; width: 104px; }
+  .sailtxt small { font-size: 10.5px; }
+  .score { font-size: 36px; }
+  .actions .btn.big { flex: 1 1 100%; }
+  .keys { font-size: 14px; gap: 4px 10px; }
+  .chart-frame { padding: 8px; }
+  .panel { padding: 16px 14px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .btn, .ticker, .toast { transition: none; }
+  .btn:hover { transform: none; }
+}
+</style>
+</head>
+<body>
+<canvas id="sea" hidden aria-label="The voyage: your boat on the chart" role="img"></canvas>
+
+<!-- TITLE -->
+<section id="title" class="screen" aria-labelledby="gameName">
+  <div class="title-grid">
+    <div class="title-card card">
+      <p class="kicker">A sea chart in seven fabrics</p>
+      <h1 id="gameName" class="sr-only">Patchwork Isles</h1>
+      <canvas id="stitchTitle" class="stitch-title" aria-hidden="true"></canvas>
+      <p class="hook">Stitch a sea chart from a scrap of cloth, then sail it before the season turns.</p>
+      <div class="menu">
+        <button class="btn primary" id="btnPlay" disabled>Play</button>
+        <button class="btn" id="btnHow">How to play</button>
+      </div>
+      <form class="seed-row" id="seedForm" autocomplete="off">
+        <label for="seedInput">Seed</label>
+        <input id="seedInput" inputmode="numeric" maxlength="9" spellcheck="false" aria-describedby="seedNote">
+        <button type="submit" class="btn small">Use</button>
+        <button type="button" class="btn small icon" id="btnReseed" aria-label="Roll a new seed" title="Roll a new seed"><svg viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="3"/><circle cx="9" cy="9" r=".6" fill="currentColor"/><circle cx="15" cy="15" r=".6" fill="currentColor"/><circle cx="15" cy="9" r=".6" fill="currentColor"/><circle cx="9" cy="15" r=".6" fill="currentColor"/></svg></button>
+        <button type="button" class="btn small icon" id="btnToday" aria-label="Use today's seed" title="Today's seed"><svg viewBox="0 0 24 24"><rect x="4" y="5" width="16" height="15" rx="2"/><path d="M4 10h16M9 3v4M15 3v4"/><circle cx="12" cy="15" r="1.4" fill="currentColor"/></svg></button>
+      </form>
+      <p class="fine" id="seedNote"></p>
+      <p class="fine" id="titleBest"></p>
+      <p class="loadnote" id="loadNote" role="status">Threading the loom…</p>
+      <p class="credits">Sewn with <a href="https://github.com/kchapelier/wavefunctioncollapse" target="_blank" rel="noopener">wavefunctioncollapse</a> 2.1.0 by Kevin Chapelier (MIT), a JavaScript port of Maxim Gumin's WaveFunctionCollapse. Set in Alegreya and Special Elite (SIL Open Font License). Everything else is drawn in code.</p>
+    </div>
+    <figure class="attract" id="attractFig">
+      <div class="frame"><canvas id="attractCanvas" aria-label="A chart sewing itself from a sample" role="img"></canvas>
+        <div class="attract-badge card"><canvas id="badgeTitle" aria-hidden="true"></canvas></div>
+      </div>
+      <figcaption><span id="attractCap">Laying out the cloth…</span><span id="attractCount"></span></figcaption>
+    </figure>
+  </div>
+</section>
+
+<!-- WORKROOM -->
+<section id="workroom" class="screen" hidden aria-labelledby="wrTitle">
+  <div class="wr">
+    <header class="wr-head">
+      <button class="btn small icon" id="wrBack" aria-label="Back to the title" title="Back to the title"><svg viewBox="0 0 24 24"><path d="M14 6l-6 6 6 6"/></svg></button>
+      <h2 id="wrTitle">The workroom</h2>
+      <button class="btn small" id="wrHow" aria-label="How to play"><span class="long">How to play</span><span class="short" aria-hidden="true">?</span></button>
+      <button class="btn small icon" id="wrMute" aria-label="Sound off" title="Sound (M)"></button>
+      <span class="sub" id="wrSub"></span>
+    </header>
+    <div class="wr-grid">
+      <div class="panel-wrap">
+        <div class="panel card">
+          <div class="model-switch" role="group" aria-label="How the chart is sewn">
+            <button id="mPatch" aria-pressed="true"><b>Patchwork</b><span>learns from your scrap</span></button>
+            <button id="mAdm" aria-pressed="false"><b>Admiralty</b><span>fixed pattern pieces</span></button>
+          </div>
+          <div id="patchPanel">
+            <canvas id="slate" class="slate" tabindex="0" aria-label="The scrap, 12 by 12 squares. Arrow keys move the needle, Space or Enter sews the chosen fabric."></canvas>
+            <div class="fabrics" id="fabrics" role="group" aria-label="Fabrics"></div>
+            <p class="fabric-name" id="fabricName" aria-live="polite"></p>
+            <div class="row">
+              <button class="btn small" id="btnUndo">Unpick</button>
+              <button class="btn small" id="btnClear">Clear</button>
+              <button class="btn small" id="btnScatter">Scatter a scrap</button>
+            </div>
+            <div class="presets" id="presets" role="group" aria-label="Ready scraps"></div>
+          </div>
+          <div id="admPanel" hidden>
+            <h3>The pattern pieces</h3>
+            <p class="lede">No scrap here: an Admiralty chart is sewn from eleven fixed pieces, turned and mirrored. Two pieces may touch only where land meets land and sea meets sea at their corners.</p>
+            <canvas id="pieces" class="pieces" aria-label="The eleven pattern pieces: open sea, shallows, meadow, wood, fell, coast, harbour, cape, bay, strait and reef"></canvas>
+            <div class="coasts" id="coasts" role="group" aria-label="Kind of coast"></div>
+          </div>
+        </div>
+      </div>
+      <div class="wr-main">
+        <div class="chart-frame frame">
+          <div class="chart-box" id="chartBox">
+            <canvas id="chart" aria-label="The sea chart being sewn" role="img"></canvas>
+            <div class="chart-msg" id="chartMsg" hidden></div>
+          </div>
+        </div>
+        <div class="tally" id="tally" aria-hidden="true">
+          <span>Stitches <b id="tStitch">0</b></span><span id="tKnotW">Knots <b id="tKnot">0</b></span><span>Retries <b id="tRetry">0</b></span><span>Pieces <b id="tT">0</b></span><span>Chart <b id="tSeed">0</b></span>
+        </div>
+        <p class="note" id="wrNote" aria-live="polite"></p>
+        <div class="loomset" role="group" aria-label="Loom settings">
+          <span class="lab pz" id="lN">Piece size</span>
+          <div class="seg pz" role="group" aria-labelledby="lN" id="segN"><button data-v="2">2×2</button><button data-v="3">3×3</button></div>
+          <span class="lab pz" id="lS">Turns &amp; mirrors</span>
+          <div class="seg pz" role="group" aria-labelledby="lS" id="segSym"><button data-v="1">1</button><button data-v="2">2</button><button data-v="4">4</button><button data-v="8">8</button></div>
+          <span class="lab" id="lW">Wrap edges</span>
+          <div class="seg" role="group" aria-labelledby="lW" id="segWrap"><button data-v="0">Off</button><button data-v="1">On</button></div>
+        </div>
+        <div class="actions">
+          <button class="btn indigo" id="btnSew">Sew the chart</button>
+          <button class="btn" id="btnAgain">Sew again</button>
+          <button class="btn small" id="btnExport">Export PNG</button>
+          <button class="btn small" id="btnLink">Copy link</button>
+          <span class="grow"></span>
+          <button class="btn primary big" id="btnSail" disabled>Set sail</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- HUD -->
+<section id="hud" hidden aria-label="Voyage">
+  <div class="hud-card hud-tl">
+    <canvas id="dial" width="116" height="116" aria-hidden="true"></canvas>
+    <div class="hud-day" id="hudDay">Day 1 of 12</div>
+    <div class="stores" id="hudStores" aria-label="Stores"></div>
+    <div class="ports" id="hudPorts" aria-label="Harbours visited"></div>
+  </div>
+  <div class="hud-card hud-tr">
+    <canvas id="rose" width="168" height="168" aria-hidden="true"></canvas>
+    <div class="sailtxt" id="hudSail">Half sail</div>
+    <div class="hud-btns">
+      <button class="btn icon small" id="hChart" aria-label="Open the chart (C)" title="Chart (C)"><svg viewBox="0 0 24 24"><path d="M3 6l6-2 6 2 6-2v14l-6 2-6-2-6 2z"/><path d="M9 4v14M15 6v14"/></svg></button>
+      <button class="btn icon small" id="hMute" aria-label="Sound off" title="Sound (M)"></button>
+      <button class="btn icon small" id="hPause" aria-label="Pause (Esc)" title="Pause (Esc)"><svg viewBox="0 0 24 24"><path d="M9 5v14M15 5v14"/></svg></button>
+    </div>
+  </div>
+  <div class="hud-card ticker off" id="ticker"></div>
+  <div class="hud-card hints" id="hints"><kbd>←</kbd> <kbd>→</kbd> steer · <kbd>↑</kbd> <kbd>↓</kbd> sail · click the sea to set a course · <kbd>C</kbd> chart · <kbd>Esc</kbd> pause</div>
+  <div class="touch">
+    <div class="pad left">
+      <button class="btn" id="tPort" aria-label="Steer to port (left)"><svg viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg></button>
+      <button class="btn" id="tStar" aria-label="Steer to starboard (right)"><svg viewBox="0 0 24 24"><path d="M9 5l7 7-7 7"/></svg></button>
+    </div>
+    <div class="pad right">
+      <button class="btn" id="tDown" aria-label="Lower the sail"><svg viewBox="0 0 24 24"><path d="M12 5v14M6 13l6 6 6-6"/></svg></button>
+      <div class="saillvl" id="tSail">Half sail</div>
+      <button class="btn" id="tUp" aria-label="Raise the sail"><svg viewBox="0 0 24 24"><path d="M12 19V5M6 11l6-6 6 6"/></svg></button>
+    </div>
+  </div>
+</section>
+
+<!-- HOW TO PLAY -->
+<div class="modal" id="howModal" hidden role="dialog" aria-modal="true" aria-labelledby="howTitle">
+  <div class="card how-card">
+    <p class="kicker">How to play</p>
+    <h2 id="howTitle">Sew a sea, then sail it</h2>
+    <div class="how-grid">
+      <div>
+        <ol>
+          <li><b>Paint a scrap.</b> Twelve squares by twelve, in seven fabrics: indigo deep sea, chambray shallows, calico sand, gingham meadow, knotted forest, tweed rock and madder harbours. Or borrow one of the four ready scraps.</li>
+          <li><b>Sew the chart.</b> The loom cuts your scrap into every 2×2 or 3×3 piece it holds (turned and mirrored if you allow it), then sews a 72×48 sea where every overlap matches a piece it has seen. When it sews itself into a corner it ties a knot, unpicks and starts again. The Admiralty loom works from fixed coastline pieces instead.</li>
+          <li><b>Set sail.</b> Call at every harbour before the season ends. Stores run down by the day, and any harbour fills the hold and pencils more ports onto your chart. The fog lifts wherever you sail.</li>
+        </ol>
+        <h3>Wind and water</h3>
+        <p>The pennant points downwind. Sailing across the wind is fastest. Close-hauled is slow, and dead into the wind you barely move, so tack, or lower the sail and row. Shallows slow you down. Shoals beside rocks (red crosses) ground a boat under full sail, so cross them at half sail. Running ashore at speed costs you hours.</p>
+      </div>
+      <div>
+        <h3 style="margin-top:4px">Controls</h3>
+        <div class="keys" id="howKeys"></div>
+        <h3>Scoring</h3>
+        <p>120 for each harbour, 3 for every percent of the chart you reveal, and if you call at them all, 250 for the homecoming plus 40 for every day to spare.</p>
+      </div>
+    </div>
+    <div class="mrow"><button class="btn primary" id="howClose">Got it</button></div>
+  </div>
+</div>
+
+<!-- PAUSE -->
+<div class="modal" id="pauseModal" hidden role="dialog" aria-modal="true" aria-labelledby="pauseTitle">
+  <div class="card">
+    <p class="kicker" id="pauseKicker">Voyage</p>
+    <h2 id="pauseTitle">Paused: the needle rests</h2>
+    <div class="mrow" style="margin-top:6px">
+      <button class="btn primary" id="pResume">Resume</button>
+      <button class="btn" id="pRestart">Restart voyage</button>
+      <button class="btn" id="pWork">Back to the workroom</button>
+      <button class="btn" id="pTitle">Title</button>
+    </div>
+    <h3>Settings</h3>
+    <label class="toggle"><input type="checkbox" id="optSound"> Sound <span class="fine">(M)</span></label>
+    <label class="toggle"><input type="checkbox" id="optCalm"> Reduce flashing and motion</label>
+    <h3>Controls</h3>
+    <div class="keys" id="pauseKeys"></div>
+    <p class="credits">wavefunctioncollapse 2.1.0 by Kevin Chapelier, MIT, <a href="https://github.com/kchapelier/wavefunctioncollapse" target="_blank" rel="noopener">github.com/kchapelier/wavefunctioncollapse</a>, after Maxim Gumin's WaveFunctionCollapse. Fonts: Alegreya (Huerta Tipográfica) and Special Elite (Astigmatic), SIL OFL.</p>
+  </div>
+</div>
+
+<!-- END -->
+<div class="modal" id="overModal" hidden role="dialog" aria-modal="true" aria-labelledby="overTitle">
+  <div class="card over-card">
+    <div class="over-grid">
+      <div>
+        <div class="over-head"><canvas id="overStitch" aria-hidden="true"></canvas></div>
+        <h2 id="overTitle" class="sr-only"></h2>
+        <p id="overLine"></p>
+        <div class="score" id="overScore">0</div>
+        <p class="fine" id="overBest"></p>
+        <dl class="stats" id="overStats"></dl>
+      </div>
+      <div>
+        <canvas id="overMini" class="mini" aria-label="Your chart with the voyage track"></canvas>
+        <p class="fine" id="overSeeds" style="margin-top:8px"></p>
+      </div>
+    </div>
+    <div class="mrow">
+      <button class="btn primary" id="oAgain">Play again</button>
+      <button class="btn indigo" id="oNew">New chart</button>
+      <button class="btn" id="oSave">Save voyage PNG</button>
+      <button class="btn" id="oTitle">Title</button>
+    </div>
+  </div>
+</div>
+
+<!-- CHART VIEW -->
+<div class="modal chartview" id="chartModal" hidden role="dialog" aria-modal="true" aria-labelledby="cvTitle">
+  <div class="card">
+    <div class="row" style="justify-content:space-between;margin:2px 4px 10px"><h2 id="cvTitle" style="font-size:22px;margin:0">Your chart so far</h2><span class="fine">Time stands still while you read it.</span><button class="btn small" id="cvClose">Back to the helm (C)</button></div>
+    <canvas id="cvCanvas"></canvas>
+  </div>
+</div>
+
+<!-- ERROR -->
+<div class="modal" id="errModal" hidden role="alertdialog" aria-modal="true" aria-labelledby="errTitle">
+  <div class="card error-card">
+    <p class="kicker">The loom didn't arrive</p>
+    <h2 id="errTitle">No thread, no sea</h2>
+    <p id="errText">This game loads its weaving engine, wavefunctioncollapse 2.1.0, from esm.sh, and that request failed. Check your connection (or any blocker) and try again.</p>
+    <div class="mrow"><button class="btn primary" id="errReload">Try again</button></div>
+  </div>
+</div>
+
+<div class="toast" id="toast" role="status"></div>
+<div class="sr-only" id="live" aria-live="polite"></div>
+
+<script src="../../shared/tag.js" data-no="07" data-slug="07-wavefunctioncollapse" data-tool="wavefunctioncollapse" data-position="tr" defer></script>
+<script type="module" src="./game.js"></script>
+</body>
+</html>

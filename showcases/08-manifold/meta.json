@@ -1,0 +1,117 @@
+{
+  "no": "08",
+  "slug": "08-manifold",
+  "title": "Brushwork",
+  "tagline": "Stamp add and subtract brushes to greybox a route, then walk it and ring the bell",
+  "summary": "Every level is an ordered list of solid brushes that manifold folds with union and difference on each stamp, undo and hover, so doorways, bridges and vaults appear live and the readout (triangles, vertices, genus, shells, manifold) updates with them. The result is always watertight, so the same mesh can be walked on, ray-cast, coloured by which brush made each face, and exported as a GLB.",
+  "libraries": [
+    {
+      "name": "manifold-3d",
+      "version": "3.5.4",
+      "url": "https://cdn.jsdelivr.net/npm/manifold-3d@3.5.4/manifold.js"
+    },
+    {
+      "name": "three",
+      "version": "0.186.1",
+      "url": "https://cdn.jsdelivr.net/npm/three@0.186.1/build/three.module.js"
+    }
+  ],
+  "fonts": [
+    "Martian Mono",
+    "Sofia Sans Extra Condensed"
+  ],
+  "palette": [
+    "#1a2229",
+    "#161d23",
+    "#eceeea",
+    "#bfc5c9",
+    "#9ea6ac",
+    "#f0712c",
+    "#c9a14a",
+    "#4fd59a",
+    "#ff5468"
+  ],
+  "controls": [
+    {
+      "action": "Stamp brush",
+      "keys": "click (or Enter)",
+      "touch": "tap a spot, tap again or Stamp"
+    },
+    {
+      "action": "Orbit / zoom",
+      "keys": "drag / wheel",
+      "touch": "drag / pinch"
+    },
+    {
+      "action": "Pick brush",
+      "keys": "1–5",
+      "touch": "tap the kit"
+    },
+    {
+      "action": "Add / subtract",
+      "keys": "X",
+      "touch": "ADD / SUB switch"
+    },
+    {
+      "action": "Rotate brush",
+      "keys": "R",
+      "touch": "Rotate button"
+    },
+    {
+      "action": "Raise / lower brush",
+      "keys": "E / Q",
+      "touch": "arrow buttons"
+    },
+    {
+      "action": "Nudge brush",
+      "keys": "arrow keys",
+      "touch": "tap elsewhere"
+    },
+    {
+      "action": "Undo / redo",
+      "keys": "Z / Y",
+      "touch": "Undo / Redo"
+    },
+    {
+      "action": "Walk test",
+      "keys": "P",
+      "touch": "Walk"
+    },
+    {
+      "action": "Move / look (walk)",
+      "keys": "WASD or arrows / mouse (pointer lock, or drag)",
+      "touch": "left stick / drag on the right"
+    },
+    {
+      "action": "Export level",
+      "keys": "G",
+      "touch": "pause menu"
+    },
+    {
+      "action": "Pause / mute",
+      "keys": "Esc / M",
+      "touch": "II / speaker button"
+    }
+  ],
+  "features": [
+    "The level is an ordered brush list; every stamp, undo and redo re-folds it with Manifold.union and Manifold.difference (consecutive same-op brushes batched)",
+    "Live preview: hovering a brush runs one more boolean against the committed solid, and the readout shows the deltas before you commit",
+    "Readout straight from the solid: numTri, numVert, genus (summed over decompose() shells), volume, status(), plus a check that every edge has exactly two faces",
+    "Each brush is made asOriginal(), so runOriginalID colours the result by source brush and marks player-carved faces with a section hatch",
+    "Feature lines come from manifold's faceID (edges between different faces), not an angle threshold",
+    "Cursor picking and brush support probes use Manifold.rayCast on the committed solid; the walker collides with the same triangles",
+    "Extruded CrossSections make the ramp, stairs and arch; the brass bell is a revolve() with calculateNormals()",
+    "Export the current level (and bell) as a .glb with three's GLTFExporter"
+  ],
+  "skill_files_read": [],
+  "lessons": [
+    "Manifold.extrude's scaleTop must be a 2-vector: the number 1 is read as [1, 0], which silently collapses the far cap to the floor, so arches carved wedges and ramps became slivers. Pass [1, 1].",
+    "Transforms turn a Manifold into a product (originalID() becomes -1). Call asOriginal() on the untransformed brush, record that ID, then rotate and translate; getMesh().runOriginalID still points back to it, which is how faces get coloured by brush.",
+    "genus() is for a single mesh. With several shells, total genus = genus() + shells - 1 (shells = decompose().length). Delete every decompose() part and every intermediate Manifold or CrossSection; deleting a JS handle is safe even while a lazy CSG result still uses it.",
+    "RayHit.distance is a fraction of the segment you pass (origin to endpoint), not metres, and faceID comes back as a BigInt, so keep hits out of JSON.stringify.",
+    "In three r186 scene.environment is scaled by scene.environmentIntensity, not by the material's envMapIntensity; a RoomEnvironment there floods a matte greybox with flat light. Give the env map only to the metal (here the brass bell) and light the level with hemisphere + sun at physical intensities (about 3.4 and 2.1)."
+  ],
+  "deviations": "P starts and stops the walk test, as the brief asks, so pausing is on Esc (and automatic on blur, tab hide or losing pointer lock) rather than also on P; P only resumes from the pause menu. Moving the walker is a simple capsule (three spheres plus downward ground probes) against the built triangles rather than a physics engine.",
+  "browser_support": "Any current desktop or mobile browser with WebGL 2 and WebAssembly (designed fallback screens if either is missing). Pointer lock is optional: mouse-look falls back to drag-to-look.",
+  "checked": "Played with scripts/inspect.mjs playtests (generator in the scratch folder): at 1440x900 all six tickets were solved with real clicks and key presses (1/2/3 to pick brushes, X for subtract, clicks on the measured wall, plinth, island and tower faces, Z/Y undo-redo, a mouse-drag orbit), then P to walk; real W key held and a mouse drag-to-look were checked against window.__game.snapshot(), and the route to each bell rope was driven through __game.input()/step(). End screen reached (6/6 bells, 14,131 points, new best saved), GLB export returned 145 KB, Enter played again. At 390x844 two tickets were solved with taps (tap to aim and tap again, and the Stamp button), the touch stick moved the walker ~8 m and a right-side drag turned it, then the clock was run out to the losing end screen. Also checked: falls and water respawn and count, the low ceiling blocks the 1.8 m walker, identical inputs give identical snapshots, Esc pause/resume, blur auto-pause, M mute saved to localStorage, keyboard-only menus (Tab/Enter/Esc) and arrow-key brush placement, drag-to-look when pointer lock is refused, reduced-motion title, the muted attract mode inside an iframe at two sizes, no sideways overflow at either size, and zero console errors or failed requests. Every screenshot was reviewed."
+}

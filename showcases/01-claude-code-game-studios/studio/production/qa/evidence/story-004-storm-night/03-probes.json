@@ -1,0 +1,13 @@
+{
+  "run": "node scripts/inspect.mjs showcases/01-claude-code-game-studios/ --steps s004.json (1440x900 and 390x844)",
+  "date": "2026-10-19T23:00-03:00",
+  "seed": "20261019",
+  "schedule": {"events": 22, "before0200": 10, "after0200": 12, "kinds": {"gust": 12, "burst": 7, "stall": 3},
+               "stallTimes_s": [101.77, 158.91, 211.12], "minStallGap_s": 52.21, "sameSeedSameSchedule": true},
+  "stormAtHourMarks_2200to0500": [0.25, 0.35, 0.5, 0.7, 0.9, 1.0, 0.65, 0.85],
+  "clock": {"at108s": "02:00", "at216s": "06:00", "endedFlag": true},
+  "firstLogEntries": [["7.5", "gust"], ["16.3", "gust"], ["27.0", "hour"], ["32.4", "gust"], ["50.7", "gust"], ["54.0", "hour"]],
+  "coughThenStall": ["cough@99.3", "stall@101.8"],
+  "crank": {"hitsAfter_green_red_green+green": [1, 0, 2], "afterThirdHit": {"hits": 0, "stalled": false, "running": true}},
+  "consoleErrors": 0
+}

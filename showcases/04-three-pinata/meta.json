@@ -1,0 +1,85 @@
+{
+  "no": "04",
+  "slug": "04-three-pinata",
+  "title": "Seconds Day",
+  "tagline": "Pull back, throw, and smash a pottery's flawed seconds without breaking the keeper",
+  "summary": "Every pot is a watertight procedural solid that three-piñata breaks on impact into seeded Voronoi fragments, crowded around the contact point, with more pieces for harder hits; big shards break again when they land, and a wire-cutting interval slices clay with planes. Glazed outsides keep each pot's own glaze while every broken face shows raw terracotta, mapped through the library's cut-face UVs.",
+  "libraries": [
+    {
+      "name": "@dgreenheck/three-pinata",
+      "version": "2.0.1",
+      "url": "https://cdn.jsdelivr.net/npm/@dgreenheck/three-pinata@2.0.1/build/three-pinata.es.js"
+    },
+    {
+      "name": "three",
+      "version": "0.186.1",
+      "url": "https://cdn.jsdelivr.net/npm/three@0.186.1/build/three.module.js"
+    },
+    {
+      "name": "@dimforge/rapier3d-compat",
+      "version": "0.21.0",
+      "url": "https://cdn.jsdelivr.net/npm/@dimforge/rapier3d-compat@0.21.0/dist/rapier.mjs"
+    }
+  ],
+  "fonts": [
+    "Caprasimo",
+    "Recursive"
+  ],
+  "palette": [
+    "#f3ede3",
+    "#2c4a8c",
+    "#7b2420",
+    "#9fc0a5",
+    "#d9cba9",
+    "#c4693f",
+    "#2a3032"
+  ],
+  "controls": [
+    {
+      "action": "Throw",
+      "keys": "press anywhere, drag back, let go (pull further for a harder throw, sideways to aim)",
+      "touch": "drag down from the basket and let go"
+    },
+    {
+      "action": "Aim with keys",
+      "keys": "← → aim, ↑ ↓ power, Space throws",
+      "touch": ""
+    },
+    {
+      "action": "Cut the clay",
+      "keys": "drag across the block, or ← → move and ↑ ↓ tilt the wire, Space pulls",
+      "touch": "swipe across the block"
+    },
+    {
+      "action": "Pause",
+      "keys": "Esc or P",
+      "touch": "pause button, top right"
+    },
+    {
+      "action": "Mute",
+      "keys": "M",
+      "touch": "speaker button, top right"
+    }
+  ],
+  "features": [
+    "Every pot breaks where it is hit: DestructibleMesh.fracture with 3D Voronoi seeds crowded around the contact point (impactPoint, impactRadius), and a harder hit asks for more fragments.",
+    "Plates and kiln shelves use the 2.5D Voronoi mode projected along their thin axis, so they crack into flat shards rather than chunks.",
+    "Refracturing: shards that land hard break again with fewer pieces; generations are tracked in the game and capped at two.",
+    "Plane slicing: the wedging-bench interval cuts a block of wet clay with sliceWorld, and the game weighs each lump by its volume.",
+    "Dual materials: each pot keeps its own glaze outside, the keeper carries a blue thumbprint painted into its glaze texture, and every broken face is terracotta, textured through the library's cut-face UVs.",
+    "Seeded fractures: each break passes a seed drawn from the day's RNG, so the same seed and throws give the same shards.",
+    "Fragments become Rapier bodies with convex-hull colliders built from their own vertices, inheriting the pot's velocity plus a burst away from the impact.",
+    "A fragment budget freezes sleeping shards and retires the smallest; between rounds a broom sweeps floor shards onto a pile that is merged into a few meshes and kept as the day's tally."
+  ],
+  "skill_files_read": [],
+  "lessons": [
+    "fracture() places fragments with the mesh's matrixWorld but copies its local quaternion and scale, so keep destructible meshes as direct children of the scene and call updateMatrixWorld() before breaking them. slice() doesn't recentre its pieces; fracture() does.",
+    "The library needs watertight input. Build lathe solids with a single pole vertex at each end; seam duplicates are fine, since it welds by position. Hand it position, normal and uv: other attributes are dropped from the fragments.",
+    "Cut-face UVs are normalised to 0..1 per face (textureScale multiplies that), so a texture drawn as ripples from one corner reads as each break's own fracture origin.",
+    "In Rapier 0.21, convex hulls resting face to face slide off each other (stacked plates fell through the stack), and bodies created asleep sink when woken. Give intact objects primitive or compound colliders, keep hulls for fragments, and create bodies awake so they settle.",
+    "Fracturing is synchronous (10 to 40 ms for 8 to 14 pieces of an 800-triangle pot), so run it inside a fixed sim step and cover it with a short hit pause. Its triangulator sometimes logs 'Failed to find final triangle', which is harmless."
+  ],
+  "deviations": "The wire cutter is an interval between rounds II and III rather than a fourth round: three pulls of the wire, and every lump within 60 g of 500 g becomes a heavy clay ball for the kiln stack, so the slicing feeds the finale. Intact pots stand on compound primitive colliders (cylinders, boxes, a ball) instead of convex hulls, because in Rapier 0.21 hulls resting face to face slide off each other; fragments use convex hulls built from their own vertices, as briefed. A shattering pot gives its neighbours a small push, aimed high and towards the shelf front, so that chain reactions happen; without it a hit pot simply vanished and its shards were too light to knock anything over. Inside an iframe the title card shrinks to a corner sign without buttons, so the attract shatter stays visible in the preview.",
+  "browser_support": "Any modern desktop or mobile browser with WebGL 2 and WebAssembly (Chrome, Edge, Firefox, Safari 15+).",
+  "checked": "Played two full days with real input through scripts/inspect.mjs --steps: title, how-to, Play, all three rounds, the wire interval and the receipt, then Play again. At 1440×900 with mouse drags the day ended in a loss (188, round III short of its quota); at 390×844 with touch drags from the basket and swipes across the clay it was a win (237). Both runs reproduced their __game probes exactly. Zero console errors, zero failed requests, no sideways scroll at either size. Esc pauses and resumes mid-round, Escape closes the how-to card, and M mutes, with the setting saved in localStorage. Determinism: the same seed and inputs give identical snapshots, fragment positions included (40 to 47 shards), at both sizes, and a different seed gives a different result. Reduced motion turns 'reduce flashing' on and swaps the card swing for a fade. In an iframe the title becomes a corner sign over the muted attract (a mug shattering on a stool), with no corner label and no audio. A CDN failure during one run showed the designed error state. In Node, about 5,300 seeded fractures and refractures of every pot shape finished without a hang and conserved volume. The library's triangulator occasionally logs the warning 'Failed to find final triangle'."
+}

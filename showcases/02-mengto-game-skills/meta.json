@@ -1,0 +1,115 @@
+{
+  "no": "02",
+  "slug": "02-mengto-game-skills",
+  "title": "Hedge Witch",
+  "tagline": "Hold a walled herb garden through one night with fire, frost and a chain of lightning",
+  "summary": "Meng To's game skills shaped this small isometric action-RPG from the inside out: a deterministic fixed-tick sim with every spell built as startup, active and recovery frames, telegraphed enemy AI on named states, and review routes to open any bell or boss phase. The spells take their look from the fire, frost and lightning VFX skills, scaled down to a dozen foes on a phone, and were scored on stepped-clock contact strips by two blind judges against the polish skill's readability rubric.",
+  "libraries": [
+    {
+      "name": "three",
+      "version": "0.186.1",
+      "url": "https://cdn.jsdelivr.net/npm/three@0.186.1/build/three.module.js"
+    }
+  ],
+  "fonts": [
+    "IM Fell French Canon",
+    "Alegreya Sans",
+    "Alegreya Sans SC"
+  ],
+  "palette": [
+    "#0d1526",
+    "#efe4c9",
+    "#2b2016",
+    "#f2b45c",
+    "#ff7a3a",
+    "#9cc4ff",
+    "#a7adff",
+    "#4f6b3a"
+  ],
+  "controls": [
+    {
+      "action": "Move",
+      "keys": "WASD / arrows",
+      "touch": "left thumb stick (floats where you touch)"
+    },
+    {
+      "action": "Aim",
+      "keys": "mouse (no mouse: spells find the nearest foe)",
+      "touch": "drag from a spell button; tap to aim at the nearest foe"
+    },
+    {
+      "action": "Ember",
+      "keys": "left click / J / 1",
+      "touch": "ember button"
+    },
+    {
+      "action": "Rime",
+      "keys": "right click / K / 2",
+      "touch": "rime button"
+    },
+    {
+      "action": "Spark",
+      "keys": "Space / L / 3",
+      "touch": "spark button"
+    },
+    {
+      "action": "Skip aside",
+      "keys": "Shift",
+      "touch": "skip button"
+    },
+    {
+      "action": "Choose a charm",
+      "keys": "1 / 2 / 3 or click",
+      "touch": "tap a packet"
+    },
+    {
+      "action": "Pause / sound",
+      "keys": "Esc or P / M",
+      "touch": "buttons, top right"
+    }
+  ],
+  "features": [
+    "build-isometric-arpg: built in its slice order (walk and camera, one spell, one foe, a charm, the dawn objective), with spells, foes, bells and charms as data in content.js and every random draw on its own seeded stream",
+    "design-action-combat: each spell has startup, active and recovery frames and a cooldown; contact is decided in the sim (the seed hits on landing, the frost when its front arrives, each Spark link when its leader reaches the foe), and visuals only read the event log",
+    "tune-enemy-ai and design-game-encounters: named states with dwell times, a rear-up before every bite, a red lane before every charge, an attack token so one or two beetles commit at once, and a two-phase Thornback that keeps its learned charge timing",
+    "Fire, frost and lightning VFX skills, scaled down: buoyant flame tongues in broken clumps with a hot core low and dark tips, frost grown once on the CPU and revealed by arrival time, held lightning trees with a leader and afterglow, and two-tone ink impact frames capped at three a second",
+    "create-game-vfx and build-game-audio-feedback: pooled particles, decals, bolts and ice pieces with fixed budgets per quality tier; every cue synthesised in WebAudio with priorities and a voice cap",
+    "build-mobile-threejs-games: a floating stick, drag-to-aim spell buttons with cooldown rings, safe-area insets, a lighter tier for phones and a portrait camera that backs off",
+    "game-dev-combat-skill-polish: casts filmed on a frozen, stepped clock into contact strips and scored by two fresh blind judges (lower kept); the weakest spell, Ember, was rebuilt and re-judged"
+  ],
+  "skill_files_read": [
+    "README.md",
+    "agent-skills/game-development/README.md",
+    "agent-skills/game-development/build-isometric-arpg/SKILL.md",
+    "agent-skills/game-development/build-game-camera-controls/SKILL.md",
+    "agent-skills/game-development/design-action-combat/SKILL.md",
+    "agent-skills/game-development/tune-enemy-ai/SKILL.md",
+    "agent-skills/game-development/design-game-encounters/SKILL.md",
+    "agent-skills/game-development/create-game-vfx/SKILL.md",
+    "agent-skills/game-development/build-game-audio-feedback/SKILL.md",
+    "agent-skills/game-development/build-mobile-threejs-games/SKILL.md",
+    "agent-skills/game-development/test-playable-web-games/SKILL.md",
+    "agent-skills/game-development/optimize-threejs-games/SKILL.md",
+    "agent-skills/game-development/build-threejs-enemy-systems/SKILL.md",
+    "agent-skills/game-combat/README.md",
+    "agent-skills/game-combat/fire-smoke-skill-vfx/SKILL.md",
+    "agent-skills/game-combat/ice-frost-skill-vfx/SKILL.md",
+    "agent-skills/game-combat/lightning-energy-skill-vfx/SKILL.md",
+    "agent-skills/game-combat/game-dev-combat-skill-polish/SKILL.md",
+    "agent-skills/game-combat/game-dev-combat-skill-polish/references/rubric-readability.md",
+    "agent-skills/game-combat/game-dev-combat-skill-polish/references/rubric-art.md",
+    "agent-skills/game-combat/game-dev-combat-skill-polish/templates/judge-prompt.md",
+    "agent-skills/game-combat/game-dev-combat-animation/SKILL.md",
+    "agent-skills/game-combat/game-dev-combat-animation/references/techniques.md"
+  ],
+  "lessons": [
+    "three r186 skips tone mapping and the sRGB transform when you render into a render target, so a custom composite has to apply both itself; copy three's ACESFilmic, including its /0.6 exposure, or the scene shifts when you move it off the default framebuffer.",
+    "ShaderMaterial.clone() deep-copies its uniforms, so a shared time uniform has to be attached again after every clone, or the cloned telegraphs and decals freeze.",
+    "Headless Chrome renders on the CPU at 1 to 6 fps, so a 6-step catch-up cap slows the sim to a crawl in playtests. A test-only ?maxsteps= keeps it near real time. Film effects on a stopped clock you step yourself, and stop the rAF loop from rendering between steps: it was eating the 0.08 s ink impact frames before the screenshot.",
+    "Release a projectile at the end of the throw, not at the top of the wind-up, and draw a new bolt into its buffer the moment it's made. A seed leaving from behind the head, or a contact flash one frame before its bolt, was the first thing every blind judge marked down.",
+    "A clip-path polygon worked out from getBoundingClientRect clips scaled or rotated cards and goes stale once web fonts load. Use offsetWidth/offsetHeight and re-cut it in a ResizeObserver."
+  ],
+  "deviations": "The polish skill's blind judges were two fresh subagents per round, each given only the rubric, a list file and the strips (as the skill describes). Its film, strip and judge scripts weren't run: an in-page stepped-clock hook, a scratch HTML strip page and headless screenshots did that job. Ember's strips use 0.075 s tiles so the landing and the slugs' reaction fit on the strip. Six rounds lifted the lower-judge readability scores to Ember 6.5, Rime 7 and Spark 6.5 (peaks 7, 8 and 7.5), above the skill's 6+ bar. They then plateaued at about the judge spread. The skill's next lever, a modelled hero asset made with image-to-3D, isn't allowed under the house rules (everything here is procedural geometry). The fire, frost and lightning effects keep the skills' visual language (buoyant flame tongues, frost grown and revealed by arrival time, held lightning trees with ink impact frames) but use billboards, decals and ribbons instead of ray-marched volumes, so a dozen foes stay affordable on a phone. Ink impact frames are kept for the boss, shatters and the boss phase change; ordinary shell cracks get a local flash, because a judge read a full ink frame there as a crude white blob. I added a Skip dodge (Shift) that isn't in the brief, so beetle charges have an answer besides walking away. The night is six bells. The autopilot clears it in about 3.5 to 4 minutes, so a person should take about 4 to 6.",
+  "browser_support": "any modern browser with WebGL 2 (a designed fallback explains if it is missing)",
+  "checked": "Real-input playtests in headless Chrome (rendering on the CPU at 1 to 6 fps; a test-only ?maxsteps=40 kept the sim near real time). At 1440x900: two full rounds from the title (Enter) on key presses and left clicks, through a charm pick to the end card. Both were losses on bells 2 and 3 by a blind scripted player that roams in a loop and fires spells at the nearest foe. After the end card, Enter started Play again. At 390x844: a full round on taps, thumb-stick drags and drag-to-aim, through two charm picks to the end card. Also checked: pause and resume (Esc, the button, Enter with nothing focused), mute on M (stored in localStorage), How to play and Settings, ?wave=, ?boss=1 and ?boss=2, ?review=, reduced motion, and an 800x500 iframe preview (muted attract mode, compact card). __game probes confirmed every state change. The same seed and the same inputs gave identical snapshots in the browser and in Node. Zero console errors, zero failed requests, and no sideways overflow at either size. In Node, the attract-mode pilot played the fixed-tick sim on 8 seeds: 7 nights won in 3.5 to 4 minutes, losing 0 to 5 herbs, and one lost. Six rounds of stepped-clock contact strips per spell were scored by two fresh blind judges on the polish skill's readability rubric, lower score kept: Ember 6, 6, 6.5, 6.5, 7, 6.5; Rime 7, 7.5, 7.5, 7.5, 8, 7; Spark 6.5, 6.5, 7, 7.5, 6.5, 6.5. Scene cost at the boss is about 107 draw calls and 67k triangles. Our files weigh about 350 KB. After the coordinator's QA pass: big numbers now use Alegreya Sans lining figures, checked with 10, 100 and 1,000 on the end card at both sizes. Spell countdowns sit in the icon slot, so the name and key hint stay readable. Coach lines close once the player does what they ask (or after 6 s of real time), and are hidden on the end card, the charm screen and pause. Both full-round playtests were rerun on the fixed build: zero errors, and Play again worked."
+}

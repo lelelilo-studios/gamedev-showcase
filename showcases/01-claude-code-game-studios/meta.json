@@ -1,0 +1,124 @@
+{
+  "no": "01",
+  "slug": "01-claude-code-game-studios",
+  "title": "Hold the Cold",
+  "tagline": "Scrape frozen coolers, haul fuel through a blizzard and keep a seed vault cold until six",
+  "summary": "Claude Code Game Studios' lightest mode (rigor minimal, solo review) took a one-line hint to a one-page brief, eight stories and a finished browser game, and every one of its documents is in the binder below the game, written in order while building. Its run-and-observe rule held throughout: no story closed until the game was launched, looked at and a screenshot kept, and its scripted playtest caught the one thing the stories' criteria could not: a night nobody could lose.",
+  "libraries": [],
+  "fonts": [
+    "Big Shoulders Stencil",
+    "Martian Mono",
+    "Courier Prime",
+    "Reenie Beanie"
+  ],
+  "palette": [
+    "#0d1424",
+    "#182238",
+    "#bfe6f0",
+    "#eef7fa",
+    "#ffb03a",
+    "#f08a24",
+    "#ff5b4a",
+    "#d4b77e"
+  ],
+  "controls": [
+    {
+      "action": "Walk",
+      "keys": "A / D or ← / →, or click a spot",
+      "touch": "tap a spot"
+    },
+    {
+      "action": "Climb",
+      "keys": "W / S or ↑ / ↓ (walks to the ladder)",
+      "touch": "tap the floor you want"
+    },
+    {
+      "action": "Work (scrape, take a can, pour)",
+      "keys": "hold Space or E, or hold the click on a machine",
+      "touch": "hold WORK, or hold a machine"
+    },
+    {
+      "action": "Crank a stalled generator",
+      "keys": "press Space when the needle is in the green, three times",
+      "touch": "tap WORK in the green"
+    },
+    {
+      "action": "Pause",
+      "keys": "Esc or P",
+      "touch": "pause button"
+    },
+    {
+      "action": "Sound",
+      "keys": "M",
+      "touch": "speaker button"
+    }
+  ],
+  "features": [
+    "/start set rigor minimal (which implies solo review) and guided automation; the engine was recorded as none, since /setup-engine only knows Godot, Unity and Unreal",
+    "/brainstorm's Lean Brief flow: three one-line pitches, the human's pick, and the one-page game-brief.md with an MVP of seven items (an eighth was pushed back and cut)",
+    "/create-stories built the epic from the brief with no /create-epics: one story per MVP item, coarse criteria, typed Logic, Integration, UI or Visual/Feel",
+    "/dev-story ↔ /story-done for every story, with real start and close times; each Run result line points to WebP evidence and a hash stamp, and the Visual/Feel stories carry signed evidence records",
+    "/playtest-report analyze, after two real-input nights (desktop clicks and keys, phone taps and long-presses), named the game too easy; a ninth step followed: story 008 (tuning) and two S2 bugs, filed, fixed, verified and closed",
+    "/smoke-check at qa.level minimal (tests waived, launch and critical paths carry it) and /gate-check release: smoke PASS + no open S1, chain-of-verification, stage advanced to Release",
+    "/retrospective at minimal: no sprint data, so velocity and estimation read NOT ASSESSED — NO DATA, as the skill insists",
+    "The binder renders the studio's own Markdown from studio/ (embedded for file://): pitches, brief, story cards with evidence, playtest reports, bugs, gate stamps and the retrospective"
+  ],
+  "skill_files_read": [
+    "README.md",
+    "CLAUDE.md",
+    "project.yaml",
+    ".claude/skills/start/SKILL.md",
+    ".claude/skills/brainstorm/SKILL.md",
+    ".claude/skills/create-stories/SKILL.md",
+    ".claude/skills/create-stories/CONTRACT.md",
+    ".claude/skills/dev-story/SKILL.md",
+    ".claude/skills/story-done/SKILL.md",
+    ".claude/skills/playtest-report/SKILL.md",
+    ".claude/skills/gate-check/SKILL.md",
+    ".claude/skills/gate-check/references/2b-workflow-tier.md",
+    ".claude/skills/gate-check/references/3-run-gate-check.md",
+    ".claude/skills/gate-check/references/4-assessment.md",
+    ".claude/skills/gate-check/references/5-verdict.md",
+    ".claude/skills/gate-check/references/6-update-stage.md",
+    ".claude/skills/gate-check/references/7-next-steps.md",
+    ".claude/skills/gate-check/references/gate-release.md",
+    ".claude/skills/gate-check/references/gate-polish.md (tier reductions)",
+    ".claude/skills/gate-check/references/gate-production.md (tier reductions)",
+    ".claude/skills/gate-check/references/gate-systems-design.md (tier reductions)",
+    ".claude/skills/retrospective/SKILL.md",
+    ".claude/skills/setup-engine/SKILL.md",
+    ".claude/skills/smoke-check/SKILL.md",
+    ".claude/skills/smoke-check/references/1-detect-setup.md",
+    ".claude/skills/smoke-check/references/4-manual-checks.md",
+    ".claude/skills/smoke-check/references/5-report.md",
+    ".claude/skills/bug-report/SKILL.md (verify and close modes)",
+    ".claude/docs/config-resolution.md",
+    ".claude/docs/run-and-observe.md",
+    ".claude/docs/coding-standards.md",
+    ".claude/docs/automation-modes.md",
+    ".claude/docs/workflow-modes.md",
+    ".claude/docs/workflow-catalog.yaml (paths.minimal)",
+    ".claude/docs/templates/game-brief.md",
+    ".claude/docs/templates/story.md",
+    ".claude/docs/templates/test-evidence.md",
+    ".claude/docs/templates/prototype-report.md",
+    ".claude/docs/templates/session-state.md",
+    ".claude/docs/templates/bug-report.md",
+    ".claude/docs/templates/help-where-you-are-minimal.md",
+    ".claude/agents/creative-director.md",
+    ".claude/agents/game-designer.md",
+    ".claude/agents/prototyper.md",
+    ".claude/agents/qa-lead.md",
+    ".claude/agents/producer.md"
+  ],
+  "lessons": [
+    "Every skill's first line asks Claude Code to run a config helper; without it, read project.yaml by hand and fall back to config-resolution.md's table. Rigor minimal expands to solo review, so /start must not write review_mode, or it pins it.",
+    "Stories that each pass their criteria can still add up to a game nobody can lose. Get a balance probe (here, the title screen's self-playing keeper run over 16 seeds) working as soon as the core loop exists, not after the last story.",
+    "Run-and-observe needs a way to reach a state: a small debug hook (set frost, time, a stall) is the browser's equivalent of the skill's launch arguments. Keep the hit pause and other cosmetics out of step() so snapshots stay deterministic.",
+    "Test tooling lies too. A guessed tap position and a balance bot that could never hit the crank both looked like game bugs; measure positions in the page, and check the probe before blaming the game.",
+    "At minimal, /story-done writes only the story file, so EPIC.md's status table goes stale by design; the story files and session logs are the record."
+  ],
+  "deviations": "No engine (the brief's choice): /setup-engine was not run, the engine and commands were added to project.yaml by hand, and every story's engine risk reads NOT ASSESSED. None of the pack's hooks or scripts were run (config helper, stamps, artifact checks); each was done by hand and the logs say so, the evidence stamps being plain sha256 lists. Evidence lives in studio/production/qa/evidence/ (the studio's own path, as the operating notes asked) rather than studio/evidence/. After the playtest the human named an eighth story (tuning), and two bugs were filed and fixed outside any story. The binder itself is page code, not a studio story. The code root is the showcase folder, not studio/src.",
+  "browser_support": "any modern browser (Canvas 2D and WebAudio); opens from file:// too",
+  "checked": "At 1440×900 and 390×844 (plus 1280×720, 1920×1080 and 2560×1080): zero console errors, zero failed requests, no sideways scroll. Full nights played end to end with real input: desktop by clicks and keys, phone by taps and long-presses on WORK, from the title through two fuel runs and three stalls to the end screen, Play again and pause. That was three desktop nights (3,000 → compromised → 2,733 across tuning and bug fixes) and one phone night (3,000 before tuning); after the final typography pass, one more full night per size on the shipped build: desktop dawn 2,704, phone dawn 2,944, both with zero errors. Every story was run, looked at and kept as WebP evidence (all under 60 KB). Determinism (same seed and inputs give the same snapshot), the keyboard-only menus, focus, M mute stored, reduce flashing on under prefers-reduced-motion, auto-pause on blur and hidden, no AudioContext before a gesture, the iframe preview (muted demo night, binder and label hidden) and opening from file:// were each checked by probe. Balance was run over 16 seeds at four keeper skills; render cost measured at 6.5 ms (1440) and 3.4 ms (390) in software rendering."
+}

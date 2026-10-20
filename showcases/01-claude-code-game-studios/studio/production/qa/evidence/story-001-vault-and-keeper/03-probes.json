@@ -1,0 +1,12 @@
+{
+  "run": "node scripts/inspect.mjs showcases/01-claude-code-game-studios/ --steps s001b.json --sizes 1440x900",
+  "date": "2026-10-19T22:47-03:00",
+  "travel": {"shedToBayC_s": 12.22, "atShed": {"x": 72, "y": 236, "floor": 0, "ladder": -1}},
+  "clamp": {"leftMost": {"x": 56, "y": 700, "floor": 2}, "rightMost": {"x": 568, "y": 700, "floor": 2}},
+  "determinism": {"same": true, "snapshot": {"seed": "20261019", "tick": 462, "keeper": {"x": 341.5, "y": 468, "floor": 1, "ladder": -1}}},
+  "afterDown_keyboard": {"tick": 255, "keeper": {"x": 84, "y": 625.333, "floor": null, "ladder": 1}},
+  "desktopClickOnShed_after3500ms": {"keeper": {"x": 496.5, "y": 236, "floor": 0}},
+  "phoneTapNearShed_after6000ms": {"keeper": {"x": 524, "y": 403.1, "floor": null, "ladder": 0}},
+  "overflowX": {"1440x900": false, "390x844": false},
+  "consoleErrors": 0
+}

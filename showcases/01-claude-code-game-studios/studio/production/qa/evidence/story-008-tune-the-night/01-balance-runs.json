@@ -1,0 +1,21 @@
+{
+  "what": "the demo keeper (__game.debug.autoplay) on seeds bal-0 .. bal-15, in simulation time; skill 1 = instant and exact, lower = slower to notice, later to fetch fuel, a timing error on the crank",
+  "date": "2026-10-19T23:44-03:00",
+  "before_story_008": {
+    "skill_1":   {"avg": 3000, "min": 2999, "median": 3000, "max": 3000, "lost": 0, "perfect": "most"},
+    "skill_0.8": {"avg": 2993, "min": 2945, "median": 3000, "lost": 0},
+    "skill_0.6": {"avg": 2885, "min": 2186, "median": 3000, "lost": 0},
+    "skill_0.45": {"avg": 2526, "min": 1498, "median": 2713, "lost": 3},
+    "note": "the first balance run, before the playtest, used a keeper whose crank logic was broken below skill 1; these rows are from the fixed keeper"
+  },
+  "candidates_tried": ["A (too hard: the perfect keeper lost 4 of 16)", "B", "C", "M1", "M2", "M3", "M4", "M5", "M6 (chosen)", "M7"],
+  "after_story_008": {
+    "skill_1":    {"avg": 2862, "min": 2331, "median": 2984, "max": 3000, "lost": 0, "perfect": 4},
+    "skill_0.8":  {"avg": 2891, "min": 2565, "median": 2985, "max": 3000, "lost": 0, "perfect": 3},
+    "skill_0.6":  {"avg": 2380, "min": 1498, "median": 2610, "max": 2998, "lost": 3, "perfect": 0},
+    "skill_0.45": {"avg": 1980, "min": 1497, "median": 1649, "max": 3000, "lost": 8, "perfect": 1}
+  },
+  "regressions": {"icedBayToThawLine_s": 22.25, "fullScrape_s": 1.93, "eventsBefore0200": 10, "eventsAfter0200": 13,
+                  "generatorLeftAloneDry_s": 117, "twoCansAt95and170_lowestFuel": 19.1},
+  "consoleErrors": 0
+}

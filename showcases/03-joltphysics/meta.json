@@ -1,0 +1,94 @@
+{
+  "no": "03",
+  "slug": "03-joltphysics",
+  "title": "Harbour Crane",
+  "tagline": "Load a rocking lighter with an old dockside crane before the tide turns. Mind the swing.",
+  "summary": "Every lot on the quay, the lighter, the crane and its rope are Jolt rigid bodies: the slew and luff are motor-driven hinges, the rope is a chain of bodies on distance constraints, and the lighter floats, lists and floods through ApplyBuoyancyImpulse. Contact events drive the thuds and the damage, a collision view draws Jolt's own shapes and constraints, and the end screen re-runs the shift from its lever log to show the fixed-step simulation is deterministic, down to a hash of Jolt's saved state.",
+  "libraries": [
+    {
+      "name": "jolt-physics",
+      "version": "1.1.0",
+      "url": "https://cdn.jsdelivr.net/npm/jolt-physics@1.1.0/dist/jolt-physics.wasm-compat.js"
+    },
+    {
+      "name": "three",
+      "version": "0.186.1",
+      "url": "https://cdn.jsdelivr.net/npm/three@0.186.1/build/three.module.js"
+    }
+  ],
+  "fonts": [
+    "Big Shoulders Stencil",
+    "Archivo"
+  ],
+  "palette": [
+    "#c43a24",
+    "#efe6cf",
+    "#1d2321",
+    "#56716a",
+    "#c3cdc5",
+    "#b99545"
+  ],
+  "controls": [
+    {
+      "action": "Slew the jib (anticlockwise / clockwise seen from above)",
+      "keys": "A / D or ← / →",
+      "touch": "left thumb lever, sideways"
+    },
+    {
+      "action": "Luff: jib up / jib out",
+      "keys": "W / S or ↑ / ↓",
+      "touch": "left thumb lever, up and down"
+    },
+    {
+      "action": "Hoist: haul in / pay out",
+      "keys": "Q / E",
+      "touch": "right thumb lever"
+    },
+    {
+      "action": "Grab: shut / open",
+      "keys": "Space",
+      "touch": "brass Grab button"
+    },
+    {
+      "action": "Horn: end the shift early",
+      "keys": "hold H",
+      "touch": "hold the Horn button"
+    },
+    {
+      "action": "Change view (harbour, cab, deck)",
+      "keys": "C, drag the scene, mouse wheel",
+      "touch": "camera button, drag the scene"
+    },
+    {
+      "action": "Sleep view / collision view",
+      "keys": "Z / B",
+      "touch": "side buttons"
+    },
+    {
+      "action": "Tea break (pause) / sound",
+      "keys": "Esc or P / M",
+      "touch": "side buttons"
+    }
+  ],
+  "features": [
+    "The crane is built from Jolt constraints: a position-motor HingeConstraint slews the turret, a second one luffs the lattice boom, and the hoist rope is five bodies on DistanceConstraints plus a tip-to-hook limit that carries the load",
+    "Convex hull and static compound shapes for the barrel, lumpy salt sacks, rowing boat and anchor; the caged piano is two boxes of different density, so Jolt puts its centre of mass off-centre and it hangs nose-down",
+    "ApplyBuoyancyImpulse floats the lighter on a plane that follows the swell and the tide; lots that go in float or sink by their own buoyancy factor, and a dipped gunwale floods her until she founders",
+    "Gusts push the hull and the hanging load, and the lighter lists toward whatever you stack on one side",
+    "ContactListenerJS impact events drive thuds by material, wood chips, a hit pause and a per-lot damage meter",
+    "A sleep view tints every lot by Jolt's sleep state; a collision view draws shapes from ShapeGetTriangles, the constraints, centres of mass and the buoyancy plane",
+    "A Jolt ray cast puts a landing mark under the hook or the slung load",
+    "Fixed 1/60 s steps driven by a quantised lever log: the end screen rebuilds the world from the seed, replays the shift and compares hashes of PhysicsSystem.SaveState"
+  ],
+  "skill_files_read": [],
+  "lessons": [
+    "A light chain of rope bodies under a heavy hook stretches while Jolt's iterative solver converges (up to 1.5 m here). A single tip-to-hook DistanceConstraint in parallel, with the chain 3% longer than it, carries the load and keeps the hoist accurate to a few centimetres.",
+    "A hinge motor's spring is sized from the effective inertia of both bodies, so a light turret made the luff motor soft (3 to 4 degrees of sag under the boom's own weight). Raising the turret's mInertiaMultiplier fixed it without changing its mass.",
+    "ApplyBuoyancyImpulse takes a buoyancy factor relative to the body's own mass (1 is neutral), not a fluid density, so loading a barge sinks it naturally. For a long hull, average the wave slope over its length, or it rocks far too hard.",
+    "Emscripten returns by-value results (GetPosition, GetLinearVelocity) in a shared temporary: copy the numbers out before the next call. Keep a few reusable Vec3, RVec3 and Quat objects instead of allocating each step, and read contact-callback bodies by pointer through a Map rather than wrapping every one.",
+    "For a bit-exact replay, destroy the JoltInterface and build a fresh one with the bodies created in the same order, quantise analogue lever input before logging it, and hash SaveState through a StateRecorderJS to compare runs."
+  ],
+  "deviations": "The rope has a hidden tip-to-hook distance limit alongside its chain of bodies, because the chain alone stretched badly under the piano. Cargo slides off a heeling lighter long before she would roll over, so the capsize ending comes from flooding: a dipped gunwale ships water, which lowers her buoyancy factor until she founders or turns turtle. The release build of JoltPhysics.js has no debug renderer, so the collision view draws Jolt's shapes from ShapeGetTriangles and the constraints from their anchor points. The lighter's name, the harbour (Brackwick) and the crane's livery are invented.",
+  "browser_support": "Any current browser with WebGL 2 and WebAssembly (Chrome, Edge, Firefox, Safari 15 and later); a designed fallback explains what's missing otherwise",
+  "checked": "Node tests of the extracted simulation block: crane, rope stretch and boom sag sweeps, float and sink by density, flooding and capsize scenarios, drop damage, a bit-exact replay of a logged 90 s shift, and twelve world rebuilds with flat Jolt memory (no leaks). scripts/inspect.mjs playtests at 1440x900 (keys and clicks) and 390x844 (taps and touch drags) went from the title through How to play, a shift with real key presses, lever drags and the Space or Grab bite and release, collision, sleep, cab and deck views, pause and resume, the held-horn ending, the report, a re-run from the log with matching Jolt state hash, a tide-out ending and a foundering ending, with __game probes after every action. Long crane moves between real inputs used __game.goto and setDown, because headless Chrome draws about one frame every 1.5 s. Also checked: reduced motion, the iframe attract mode, the ?fail=webgl fallback, zero console errors, zero failed requests and no sideways overflow."
+}

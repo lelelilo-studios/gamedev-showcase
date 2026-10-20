@@ -1,0 +1,261 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Hedge Witch</title>
+<meta name="description" content="Hedge Witch: an isometric night-garden action game. Hold your walled herb garden till dawn with three spells: Ember, Rime and Spark.">
+<meta property="og:title" content="Hedge Witch">
+<meta property="og:description" content="One night, one lantern, three spells. Keep the slugs, snails and beetles off the herbs till the rooks wake.">
+<meta property="og:image" content="../../thumbs/02-mengto-game-skills.webp">
+<meta property="og:type" content="website">
+<meta name="theme-color" content="#0d1526">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Ccircle cx='32' cy='32' r='30' fill='%230d1526'/%3E%3Cpath d='M44 14a14 14 0 1 0 6 20 11 11 0 1 1-6-20z' fill='%23efe4c9'/%3E%3Cpath d='M14 46h30l-6-4-4-20c-1-4-5-6-8-5 3 2 3 4 2 7l-4 14z' fill='%232b2016' stroke='%23f2b45c' stroke-width='1.5'/%3E%3Ccircle cx='46' cy='44' r='3' fill='%23f2b45c'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Alegreya+Sans:ital,wght@0,400;0,500;0,700;0,800;1,400&family=Alegreya+Sans+SC:wght@500;700&family=IM+Fell+French+Canon:ital@0;1&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div id="stage" class="menu" aria-hidden="true"></div>
+
+<!-- icons, drawn for this game -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <symbol id="i-ember" viewBox="0 0 48 48"><path d="M24 5c5 7 13 12 13 22a13 13 0 0 1-26 0c0-5 2-8 5-11 0 4 2 6 4 6-2-6 0-12 4-17z" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linejoin="round"/><path d="M24 25c3 3 5 5 5 8a5 5 0 0 1-10 0c0-3 2-5 5-8z" fill="currentColor"/></symbol>
+    <symbol id="i-rime" viewBox="0 0 48 48"><g fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M24 4v40M6.7 14l34.6 20M6.7 34l34.6-20"/><path d="M24 10l-4-4M24 10l4-4M24 38l-4 4M24 38l4 4M12 17.5l-5.5 1M12 17.5l-1.5-5.5M36 30.5l5.5-1M36 30.5l1.5 5.5M12 30.5l-1.5 5.5M12 30.5l-5.5-1M36 17.5l1.5-5.5M36 17.5l5.5 1"/></g></symbol>
+    <symbol id="i-spark" viewBox="0 0 48 48"><path d="M28 3L12 27h10l-5 18 19-26H26l7-16z" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linejoin="round"/><path d="M33 19l7-3M20 34l-6 4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></symbol>
+    <symbol id="i-skip" viewBox="0 0 48 48"><g fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M18 12l12 12-12 12M28 12l12 12-12 12"/><path d="M6 18h7M4 24h8M6 30h7"/></g></symbol>
+    <symbol id="i-pause" viewBox="0 0 24 24"><path d="M7 5h3.5v14H7zM13.5 5H17v14h-3.5z" fill="currentColor"/></symbol>
+    <symbol id="i-sound" viewBox="0 0 24 24"><path d="M4 9h4l5-4v14l-5-4H4z" fill="currentColor"/><path d="M16 8.5a5 5 0 0 1 0 7M18.5 6a8.5 8.5 0 0 1 0 12" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></symbol>
+    <symbol id="i-mute" viewBox="0 0 24 24"><path d="M4 9h4l5-4v14l-5-4H4z" fill="currentColor"/><path d="M16.5 9.5l5 5M21.5 9.5l-5 5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></symbol>
+    <symbol id="i-leaf" viewBox="0 0 24 24"><path d="M4 20C4 10 10 4 20 4c0 10-6 16-16 16z" fill="currentColor"/><path d="M5 19L15 9M9 15h4M12 12V8" stroke="rgba(0,0,0,.45)" stroke-width="1.2" stroke-linecap="round"/></symbol>
+    <symbol id="i-arrow" viewBox="0 0 30 30"><path d="M15 3l10 18H5z" fill="currentColor" stroke="#1a140c" stroke-width="1.5" stroke-linejoin="round"/></symbol>
+    <symbol id="i-charm" viewBox="0 0 48 48"><g fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><circle cx="24" cy="27" r="11"/><path d="M24 16V5M19 8h10M24 22v10M19 27h10"/></g></symbol>
+    <symbol id="i-sprig" viewBox="0 0 150 22"><g fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"><path d="M2 11h146"/><path d="M75 11c-6-8-14-9-20-6 6 1 12 4 20 6zM75 11c6-8 14-9 20-6-6 1-12 4-20 6zM75 11c-6 8-14 9-20 6 6-1 12-4 20-6zM75 11c6 8 14 9 20 6-6-1-12-4-20-6z" fill="currentColor" fill-opacity=".18"/><circle cx="75" cy="11" r="2.6" fill="currentColor"/><path d="M30 11c-3-4-7-5-10-3M120 11c3-4 7-5 10-3"/></g></symbol>
+  </defs>
+</svg>
+
+<!-- HUD -->
+<div id="hud">
+  <div class="night chip" aria-hidden="true">
+    <div class="bells" id="bells"></div>
+    <div class="bellends"><span>dusk</span><span>dawn</span></div>
+    <div class="wavename" id="wavename">Dusk</div>
+    <div class="mscore"><span>score</span> <b id="score2">0</b></div>
+  </div>
+  <div class="scorebox">
+    <div class="score chip" aria-hidden="true"><span>score</span><b id="score">0</b></div>
+    <button class="iconbtn chip" id="btnMute" aria-label="Mute sound (M)" title="Sound (M)"><svg aria-hidden="true"><use href="#i-sound"/></svg></button>
+    <button class="iconbtn chip" id="btnPause" aria-label="Pause (Esc)" title="Pause (Esc)"><svg aria-hidden="true"><use href="#i-pause"/></svg></button>
+  </div>
+  <div class="herbs chip" aria-hidden="true">
+    <h4><span>the herbs</span><b id="herbcount">12 standing</b></h4>
+    <div class="herbgrid" id="herbgrid"></div>
+    <div class="losewarn" id="losewarn">Lose <b>6</b> and the night is lost.</div>
+  </div>
+  <div class="bossbar chip" id="bossbar" aria-hidden="true">
+    <div class="bn"><span>The Thornback</span><span class="plates" id="plates"><i></i><i></i><i></i></span></div>
+    <div class="hpb"><i id="bosshp"></i></div>
+    <div class="state" id="bossstate">plates shut: crack them with spark</div>
+  </div>
+  <div class="spells" id="spells" aria-hidden="true">
+    <div class="spell chip ember" id="sp-ember"><svg class="ico" style="color:var(--ember)"><use href="#i-ember"/></svg><div class="nm">Ember</div><div class="ky">left click · J</div><div class="cd"></div><div class="cdn"></div></div>
+    <div class="spell chip rime" id="sp-rime"><svg class="ico" style="color:var(--rime)"><use href="#i-rime"/></svg><div class="nm">Rime</div><div class="ky">right click · K</div><div class="cd"></div><div class="cdn"></div></div>
+    <div class="spell chip spark" id="sp-spark"><svg class="ico" style="color:var(--spark)"><use href="#i-spark"/></svg><div class="nm">Spark</div><div class="ky">space · L</div><div class="cd"></div><div class="cdn"></div></div>
+    <div class="skipchip chip" id="sp-skip"><svg><use href="#i-skip"/></svg>skip<br>shift<div class="cd"></div></div>
+  </div>
+  <div class="toast" id="toast" aria-hidden="true"></div>
+  <div class="hint chip" id="hint" aria-hidden="true"></div>
+  <div class="banner" id="banner" aria-hidden="true"><div class="b1" id="b1"></div><div class="b2" id="b2"></div><div class="b3" id="b3"></div></div>
+  <div id="arrows" aria-hidden="true"></div>
+  <div id="pops" aria-hidden="true"></div>
+  <div class="review chip" id="reviewnote" aria-hidden="true"></div>
+  <span class="sr" id="srscore" aria-live="polite"></span>
+</div>
+
+<!-- touch -->
+<div id="touch">
+  <div class="stickzone" id="stickzone"><div class="stick idle" id="stick"><div class="knob" id="knob"></div><div class="lbl">move</div></div></div>
+  <button class="tbtn spark" id="tb-spark" aria-label="Cast Spark. Drag to aim, tap to aim at the nearest foe."><svg class="ring" viewBox="0 0 100 100" aria-hidden="true"><circle class="bg" cx="50" cy="50" r="47"/><circle class="fg" cx="50" cy="50" r="47" stroke="var(--spark)" stroke-dasharray="295.3" stroke-dashoffset="0"/></svg><svg class="ico" style="color:var(--spark)" aria-hidden="true"><use href="#i-spark"/></svg><span class="tl" aria-hidden="true">spark</span></button>
+  <button class="tbtn ember" id="tb-ember" aria-label="Cast Ember. Drag to aim, tap to aim at the nearest foe."><svg class="ring" viewBox="0 0 100 100" aria-hidden="true"><circle class="bg" cx="50" cy="50" r="47"/><circle class="fg" cx="50" cy="50" r="47" stroke="var(--ember)" stroke-dasharray="295.3" stroke-dashoffset="0"/></svg><svg class="ico" style="color:var(--ember)" aria-hidden="true"><use href="#i-ember"/></svg><span class="tl" aria-hidden="true">ember</span></button>
+  <button class="tbtn rime" id="tb-rime" aria-label="Cast Rime. Drag to aim, tap to aim at the nearest foe."><svg class="ring" viewBox="0 0 100 100" aria-hidden="true"><circle class="bg" cx="50" cy="50" r="47"/><circle class="fg" cx="50" cy="50" r="47" stroke="var(--rime)" stroke-dasharray="295.3" stroke-dashoffset="0"/></svg><svg class="ico" style="color:var(--rime)" aria-hidden="true"><use href="#i-rime"/></svg><span class="tl" aria-hidden="true">rime</span></button>
+  <button class="tbtn skip" id="tb-skip" aria-label="Skip aside"><svg class="ring" viewBox="0 0 100 100" aria-hidden="true"><circle class="bg" cx="50" cy="50" r="47"/><circle class="fg" cx="50" cy="50" r="47" stroke="var(--paper)" stroke-dasharray="295.3" stroke-dashoffset="0"/></svg><svg class="ico" aria-hidden="true"><use href="#i-skip"/></svg><span class="tl" aria-hidden="true">skip</span></button>
+  <div class="aimknob" id="aimknob"></div>
+</div>
+
+<!-- loading -->
+<div class="screen on" id="loading" role="status" aria-live="polite">
+  <div class="sheet"><div class="paper">
+    <svg class="lantern-ico" viewBox="0 0 64 84" aria-hidden="true"><path d="M32 4v8M22 14h20l-3 8H25z" fill="none" stroke="#2b2016" stroke-width="2.4" stroke-linejoin="round"/><rect x="18" y="22" width="28" height="42" rx="4" fill="#2b2016"/><rect x="22" y="26" width="20" height="34" rx="2" fill="#f6d492"/><path class="fl" d="M32 34c4 5 6 8 6 12a6 6 0 0 1-12 0c0-4 2-7 6-12z" fill="#e67a2e"/><path d="M16 64h32l-4 8H20z" fill="#2b2016"/></svg>
+    <h2 style="font-size:30px">Lighting the lantern</h2>
+    <p class="small" id="loadmsg" style="margin:6px 0 0">Sweeping the paths, waking the herbs, counting the slugs.</p>
+  </div></div>
+</div>
+<div class="screen" id="error" role="alertdialog" aria-labelledby="errtitle">
+  <div class="sheet"><div class="paper">
+    <h2 id="errtitle" style="font-size:30px">The lantern won't light</h2>
+    <p id="errmsg" style="color:var(--ink-2)">This garden is drawn with WebGL 2, and this browser didn't offer it.</p>
+    <p class="small">Try a current Chrome, Edge, Firefox or Safari, with hardware acceleration switched on in its settings.</p>
+    <div class="row" style="justify-content:center;margin-top:10px"><button class="btn" onclick="location.reload()">Try again</button></div>
+  </div></div>
+</div>
+
+<!-- title -->
+<div class="screen" id="title" role="dialog" aria-labelledby="ttl">
+  <div class="scrim"></div>
+  <div class="sheet"><div class="paper">
+    <div class="overline">a night's work in brackenhollow</div>
+    <h1 class="title-name" id="ttl">Hedge <em>Witch</em></h1>
+    <svg class="sprig" aria-hidden="true"><use href="#i-sprig"/></svg>
+    <p class="hook">Hold the herb garden till the rooks wake. Everything with a mouth is coming over the wall.</p>
+    <div class="row">
+      <button class="btn big" id="btnPlay">Light the lantern</button>
+      <button class="btn ghost" id="btnHow">How to play</button>
+      <button class="btn ghost" id="btnSettings">Settings</button>
+    </div>
+    <div class="seedline"><span>Tonight's seed</span><b id="seedval">0</b><span id="seedkind">· the daily night</span><button class="linkbtn" id="btnNewSeed">roll a new night</button></div>
+    <div class="best" id="bestline">No best night yet.</div>
+    <div class="credits">Built with <a href="https://github.com/MengTo/Skills" target="_blank" rel="noopener">Meng To's game skills</a> (MengTo/Skills) and three.js r186. Type: IM Fell French Canon by Igino Marini and Alegreya Sans by Huerta Tipográfica, from Google Fonts. Everything else, from the slugs to the bells, is made in code.</div>
+  </div></div>
+</div>
+<div class="attract-note" id="attractnote" aria-hidden="true">the witch keeps her own watch</div>
+
+<!-- how to play -->
+<div class="screen" id="how" role="dialog" aria-modal="true" aria-labelledby="howt">
+  <div class="scrim"></div>
+  <div class="modal sheet"><div class="paper">
+    <div class="overline">how the night goes</div>
+    <h2 id="howt" style="font-size:38px">Six bells till dawn</h2>
+    <p style="margin:6px 0 0;color:var(--ink-2)">Twelve herbs grow in the beds. At every bell, things come over the wall to eat them. Lose six and the night is lost. Between bells you choose one charm.</p>
+    <div class="spellrows">
+      <div class="spellrow"><svg style="color:#c4521d" aria-hidden="true"><use href="#i-ember"/></svg><div><h3>Ember</h3><p>A seed thrown hot. It bursts into a ring of flame where it lands. Slugs hate it.</p></div></div>
+      <div class="spellrow"><svg style="color:#3f6fae" aria-hidden="true"><use href="#i-rime"/></svg><div><h3>Rime</h3><p>A breath of frost across the ground in front of you. Everything on it slows; snails freeze solid, and a frozen snail shatters at the next touch.</p></div></div>
+      <div class="spellrow"><svg style="color:#4b4fb0" aria-hidden="true"><use href="#i-spark"/></svg><div><h3>Spark</h3><p>A chain bolt from the lantern that jumps between up to four foes. It is the only thing that cracks a beetle's shell.</p></div></div>
+    </div>
+    <div class="foes">
+      <div class="foe"><b>Slugs</b>Soft and slow. Burn them.</div>
+      <div class="foe"><b>Snails</b>Freeze them with Rime, then break them with anything.</div>
+      <div class="foe"><b>Beetles</b>Spark the shell, then burn. They charge: watch for the red lane and skip aside.</div>
+    </div>
+    <table class="controls">
+      <tr><th>do</th><th>keyboard and mouse</th><th>touch</th></tr>
+      <tr><td>Move</td><td><span class="kbd">W</span><span class="kbd">A</span><span class="kbd">S</span><span class="kbd">D</span> or arrows</td><td>left thumb, anywhere on the left</td></tr>
+      <tr><td>Aim</td><td>the mouse; without one, spells find the nearest foe</td><td>drag from a spell button; tap to aim at the nearest foe</td></tr>
+      <tr><td>Ember</td><td>left click, <span class="kbd">J</span> or <span class="kbd">1</span></td><td>ember button</td></tr>
+      <tr><td>Rime</td><td>right click, <span class="kbd">K</span> or <span class="kbd">2</span></td><td>rime button</td></tr>
+      <tr><td>Spark</td><td><span class="kbd">Space</span>, <span class="kbd">L</span> or <span class="kbd">3</span></td><td>spark button</td></tr>
+      <tr><td>Skip aside</td><td><span class="kbd">Shift</span></td><td>skip button</td></tr>
+      <tr><td>Pause, sound</td><td><span class="kbd">Esc</span> or <span class="kbd">P</span>, <span class="kbd">M</span></td><td>buttons, top right</td></tr>
+    </table>
+    <div class="row" style="margin-top:16px"><button class="btn" id="btnHowBack">Back</button></div>
+  </div></div>
+</div>
+
+<!-- settings -->
+<div class="screen" id="settings" role="dialog" aria-modal="true" aria-labelledby="sett">
+  <div class="scrim"></div>
+  <div class="modal sheet"><div class="paper" style="min-width:min(420px,calc(100vw - 32px))">
+    <h2 id="sett" style="font-size:34px">Settings</h2>
+    <div class="toggles">
+      <div class="toggle"><span>Sound</span><button class="btn ghost" id="setSound" aria-pressed="true">on</button></div>
+      <div class="toggle"><span>Reduce flashing<br><span class="small">ink frames dim instead of invert, and no shake</span></span><button class="btn ghost" id="setFlash" aria-pressed="false">off</button></div>
+      <div class="toggle"><span>Screen shake</span><button class="btn ghost" id="setShake" aria-pressed="true">on</button></div>
+      <div class="toggle"><span>Detail<br><span class="small">lower is kinder to phones</span></span><button class="btn ghost" id="setQuality">auto</button></div>
+    </div>
+    <p class="small" id="qualnote" style="margin:0 0 10px"></p>
+    <div class="row"><button class="btn" id="btnSetBack">Done</button></div>
+  </div></div>
+</div>
+
+<!-- pause -->
+<div class="screen" id="pause" role="dialog" aria-modal="true" aria-labelledby="paust">
+  <div class="scrim"></div>
+  <div class="modal sheet"><div class="paper" style="min-width:min(460px,calc(100vw - 32px))">
+    <div class="overline" id="pausesub">the garden holds its breath</div>
+    <h2 id="paust" style="font-size:40px">Paused</h2>
+    <div class="row" style="margin:14px 0 6px">
+      <button class="btn big" id="btnResume">Resume</button>
+      <button class="btn ghost" id="btnRestart">Start the night again</button>
+    </div>
+    <div class="row" style="margin-bottom:6px">
+      <button class="btn ghost" id="btnPauseHow">How to play</button>
+      <button class="btn ghost" id="btnPauseSet">Settings</button>
+      <button class="btn ghost" id="btnQuit">Back to the title</button>
+    </div>
+    <table class="controls">
+      <tr><th>do</th><th>keys</th><th>touch</th></tr>
+      <tr><td>Move</td><td>WASD or arrows</td><td>left thumb</td></tr>
+      <tr><td>Ember, Rime, Spark</td><td>left click, right click, space (or J, K, L)</td><td>buttons; drag to aim</td></tr>
+      <tr><td>Skip aside</td><td>Shift</td><td>skip button</td></tr>
+    </table>
+    <p class="credits">Hedge Witch was built with <a href="https://github.com/MengTo/Skills" target="_blank" rel="noopener">Meng To's game skills</a> and three.js r186. Fonts: IM Fell French Canon (Igino Marini) and Alegreya Sans (Huerta Tipográfica).</p>
+  </div></div>
+</div>
+
+<!-- upgrade -->
+<div class="screen" id="upgrade" role="dialog" aria-modal="true" aria-labelledby="upt">
+  <div class="scrim"></div>
+  <h2 id="upt">The bell's foes are done.</h2>
+  <p class="sub" id="upsub">Choose a charm for the next one.</p>
+  <div class="packets" id="packets"></div>
+</div>
+
+<!-- end -->
+<div class="screen" id="end" role="dialog" aria-modal="true" aria-labelledby="endt">
+  <div class="scrim"></div>
+  <div class="modal sheet"><div class="paper">
+    <div class="overline" id="endsub">the night is over</div>
+    <h2 class="end-title" id="endt">Dawn over Brackenhollow</h2>
+    <p class="end-line" id="endline"></p>
+    <dl class="stats" id="stats"></dl>
+    <div class="scorebig"><span>score</span><b id="endscore">0</b></div>
+    <p class="small" id="endbest" style="margin:-8px 0 14px"></p>
+    <div class="row">
+      <button class="btn big" id="btnAgain">Play again</button>
+      <button class="btn ghost" id="btnNewNight">A new night</button>
+      <button class="btn ghost" id="btnEndTitle">Title</button>
+    </div>
+    <p class="small" id="endseed" style="margin:12px 0 0"></p>
+  </div></div>
+</div>
+
+<div class="sr" id="live" aria-live="polite"></div>
+
+<script src="content.js"></script>
+<script src="sim.js"></script>
+<script src="world.js"></script>
+<script src="vfx.js"></script>
+<script src="sound.js"></script>
+<script src="main.js"></script>
+<script>
+  // Fail kindly: no WebGL 2, or the CDN could not be reached.
+  (function () {
+    var ok = false;
+    try { var c = document.createElement('canvas'); ok = !!(window.WebGL2RenderingContext && c.getContext('webgl2')); } catch (e) {}
+    function fail(msg) {
+      if (window.__booted) return;
+      document.getElementById('loading').classList.remove('on');
+      if (msg) document.getElementById('errmsg').textContent = msg;
+      document.getElementById('error').classList.add('on');
+      window.__failed = true;
+    }
+    if (!ok) fail();
+    window.__hwFail = fail;
+    window.addEventListener('error', function (e) {
+      if (e && e.target && e.target.tagName === 'SCRIPT') fail('Part of the garden (three.js, from the jsDelivr CDN) could not be fetched. Check the connection and try again.');
+    }, true);
+    setTimeout(function () { if (!window.__booted && !window.__failed) fail('The garden took too long to load. The connection may be slow, or three.js could not be fetched from jsDelivr.'); }, 25000);
+  })();
+</script>
+<script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.186.1/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.186.1/examples/jsm/"}}</script>
+<script type="module">
+  import * as THREE from 'three';
+  if (!window.__failed) {
+    try { window.HW_MAIN(THREE); window.__booted = true; }
+    catch (e) { console.error(e); window.__hwFail('Something went wrong while planting the garden: ' + (e && e.message ? e.message : e)); }
+  }
+</script>
+<script src="../../shared/tag.js" data-no="02" data-slug="02-mengto-game-skills" data-tool="MengTo game skills" data-position="tl" defer></script>
+</body>
+</html>

@@ -1,0 +1,2 @@
+sha256 84feeb2da4cf567bfaebd09bed644a38103539ffcc2ecff70e4812f838c04089  index.html
+sha256 cd499982db9e33a59e258da0f0ff41d1caeddbf33e301d16619ba4cf5d57bc0f  game.js

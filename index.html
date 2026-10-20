@@ -1,0 +1,129 @@
+<!doctype html>
+<html lang="en" data-theme="auto">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The Cartridge Shelf</title>
+<meta name="description" content="Ten game-dev tools, libraries and agent skill packs, each made into an original browser game with the tool, plus the exact prompt and steps to make it again.">
+<meta property="og:title" content="The Cartridge Shelf">
+<meta property="og:description" content="Ten game-dev tools, each made into a game you can play, with the prompt and steps to recreate it.">
+<meta property="og:image" content="https://lelelilo-studios.github.io/gamedev-showcase/thumbs/index.webp">
+<meta property="og:type" content="website">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="theme-color" content="#ebe5d6" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#121211" media="(prefers-color-scheme: dark)">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cpath d='M5 3h16l3 3h3v23H5z' fill='%23292a2e'/%3E%3Crect x='8' y='8' width='16' height='12' rx='1.5' fill='%23f4efe3'/%3E%3Crect x='8' y='8' width='16' height='3' fill='%23f0b429'/%3E%3Cpath d='M9 24h2v3H9zm4 0h2v3h-2zm4 0h2v3h-2zm4 0h2v3h-2z' fill='%23505158'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wdth,wght@12..96,75..100,400..800&family=Martian+Mono:wdth,wght@87.5..112.5,400..600&family=Schibsted+Grotesk:ital,wght@0,400..700;1,400..500&display=swap">
+<link rel="stylesheet" href="assets/index.css">
+<script>try{var t=localStorage.getItem('gs-theme');if(t)document.documentElement.dataset.theme=t;var v=localStorage.getItem('gs-view');if(v)document.documentElement.dataset.view=v}catch(e){}</script>
+</head>
+<body>
+<a class="skip" href="#shelves">Skip to the shelves</a>
+
+<header class="masthead">
+  <a class="wordmark" href="./" aria-label="The Cartridge Shelf, home">
+    <svg class="mark" viewBox="0 0 32 32" aria-hidden="true"><path class="body" d="M5 3h16l3 3h3v23H5z"/><rect class="lbl" x="8" y="8" width="16" height="12" rx="1.5"/><rect class="led" x="8" y="8" width="16" height="3"/><path class="pins" d="M9 24h2v3H9zm4 0h2v3h-2zm4 0h2v3h-2zm4 0h2v3h-2z"/></svg>
+    <span>The Cartridge Shelf</span>
+  </a>
+  <p class="edition mono">Game Dev Showcase · 10 cartridges · October 2026</p>
+  <nav class="mast-actions" aria-label="Site">
+    <a class="mono hide-sm" href="docs/BUILD.md">How it was made</a>
+    <a class="mono hide-sm" id="sisterLink" href="https://lelelilo-studios.github.io/frontend-showcase/">Front-End Cabinet</a>
+    <a class="mono" href="https://github.com/lelelilo-studios/gamedev-showcase">Source</a>
+    <button class="theme-btn" type="button" id="themeBtn" aria-label="Colour theme: system">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 3.5a8.5 8.5 0 0 1 0 17z"/></svg>
+      <span class="mono" id="themeLabel">Auto</span>
+    </button>
+  </nav>
+</header>
+
+<main id="main">
+  <section class="hero" aria-labelledby="heroTitle">
+    <div class="hero-text">
+      <p class="kicker mono"><span class="led" aria-hidden="true"></span>Insert any cartridge to play</p>
+      <h1 id="heroTitle">Ten game-dev tools, pressed into <em>ten games you can play.</em></h1>
+      <p class="lede">Physics, destruction, fire, crowds, procedural maps, level geometry, level of detail and branching story, plus two agent skill packs that make a coding agent work like a game team. Each tool came from a research wiki of saved game-dev repos and became an original browser game, built with the tool itself by Claude Code. Every cartridge ships with its manual: the exact prompt, the steps and the snags.</p>
+      <p class="kinds mono" id="kinds"></p>
+    </div>
+    <figure class="rack" aria-labelledby="rackCap">
+      <div class="spines" id="spines"></div>
+      <div class="plank" aria-hidden="true"></div>
+      <figcaption class="mono" id="rackCap">The whole shelf. Each spine wears its game's palette; pull one out to play.</figcaption>
+    </figure>
+  </section>
+
+  <div class="toolbar" role="search">
+    <div class="chips" role="group" aria-label="Filter by shelf" id="chips"></div>
+    <div class="tools-right">
+      <label class="search">
+        <span class="visually-hidden">Search the shelf</span>
+        <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5"/><path d="m15.5 15.5 5 5"/></svg>
+        <input id="q" type="search" placeholder="Search games and tools" autocomplete="off" spellcheck="false">
+        <kbd aria-hidden="true">/</kbd>
+      </label>
+      <label class="sort">
+        <span class="visually-hidden">Sort</span>
+        <select id="sort">
+          <option value="no">Shelf order</option>
+          <option value="stars">Most stars</option>
+          <option value="az">A to Z</option>
+        </select>
+      </label>
+      <div class="view-toggle" role="group" aria-label="Layout">
+        <button type="button" data-view="grid" aria-pressed="true" aria-label="Cartridges"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 4h10l2 2h4v14H4z"/><path d="M7 16v2M10 16v2M13 16v2M16 16v2"/></svg></button>
+        <button type="button" data-view="list" aria-pressed="false" aria-label="List"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h16"/></svg></button>
+      </div>
+    </div>
+  </div>
+
+  <div id="shelves" class="shelves" tabindex="-1"></div>
+  <p class="empty" id="empty" hidden></p>
+</main>
+
+<footer class="colophon">
+  <div class="col">
+    <h2>How it was made</h2>
+    <p>One Claude Code session (Claude Opus 5.5) chose the ten from a personal wiki of saved posts and repos, wrote a brief for each game and ran ten builder agents in parallel, one game each. For the two skill packs, the skills’ own text was downloaded at a fixed commit and checked first, then followed; nothing from those repos was installed or run. Every game was played to its end screen in headless Chrome, with real key presses, clicks and taps, at desktop and phone sizes.</p>
+    <p><a href="docs/BUILD.md">The full process and operating instructions</a> · <a href="shared/HOUSE_RULES.md">The house rules</a></p>
+  </div>
+  <div class="col">
+    <h2>Fine print</h2>
+    <p>An independent, unofficial showcase. It isn’t affiliated with or endorsed by the makers of any of these tools, and every place, character and company in the games is fictional. Stars and licences are from the wiki snapshot of <span id="snap">2026-10-16</span>.</p>
+    <p>Code in this repo is MIT licensed. Libraries load from CDNs under their own licences; see <a href="CREDITS.md">credits</a>. The sister collection is the <a href="https://lelelilo-studios.github.io/frontend-showcase/">Front-End Cabinet</a>: twenty front-end tools, twenty sites.</p>
+  </div>
+  <div class="col keys">
+    <h2>Keys</h2>
+    <dl class="mono">
+      <div><dt><kbd>/</kbd></dt><dd>search</dd></div>
+      <div><dt><kbd>←</kbd><kbd>→</kbd><kbd>↑</kbd><kbd>↓</kbd></dt><dd>move along the shelf</dd></div>
+      <div><dt><kbd>Enter</kbd></dt><dd>play the focused game</dd></div>
+      <div><dt><kbd>M</kbd></dt><dd>open its manual</dd></div>
+      <div><dt><kbd>T</kbd></dt><dd>switch theme</dd></div>
+    </dl>
+    <p class="made mono">Lelelilo Studios · 2026</p>
+  </div>
+</footer>
+
+<dialog id="manual" class="manual" aria-labelledby="mTitle">
+  <div class="manual-inner">
+    <header class="m-cover">
+      <div class="m-band" id="mBand" aria-hidden="true"></div>
+      <p class="m-kicker mono" id="mKicker"></p>
+      <h2 id="mTitle"></h2>
+      <p class="m-tool" id="mTool"></p>
+      <div class="m-links" id="mLinks"></div>
+      <button class="m-close" type="button" id="mClose" aria-label="Close the manual"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg></button>
+    </header>
+    <div class="m-tabs" role="tablist" aria-label="The manual" id="mTabs"></div>
+    <div class="m-pages" id="mPages"></div>
+  </div>
+</dialog>
+
+<div class="toast mono" id="toast" role="status" aria-live="polite"></div>
+
+<script src="data/showcases.js"></script>
+<script src="assets/index.js"></script>
+</body>
+</html>

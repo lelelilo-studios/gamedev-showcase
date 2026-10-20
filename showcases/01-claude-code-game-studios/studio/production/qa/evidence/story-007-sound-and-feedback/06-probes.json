@@ -1,0 +1,13 @@
+{
+  "run": "node scripts/inspect.mjs showcases/01-claude-code-game-studios/ --steps s007.json and s007b.json (1440x900, 390x844), s007b.json --reduced-motion",
+  "date": "2026-10-19T23:23-03:00",
+  "audioBeforeAnyGesture": {"created": false},
+  "audioAfterFirstKey": {"created": true, "state": "running", "master": 0.85, "wind": 0.0808, "generator": 0.13},
+  "generatorStalled": {"generatorGain": 0},
+  "mutedWithM": {"master": 0},
+  "scrapeChips": {"particlesAfter700ms": 21},
+  "crank": {"hitThenMiss_hits": [1, 0], "hitPause_ms": 70},
+  "alarm": "two notes (880 Hz, 660 Hz), every 4 s while a bay is above -10 C",
+  "reducedMotion": {"lowFxDefault": "true", "particles": "a third", "spindrift": "off", "alarmWash": "steady", "lampFlickerOnRestart": "off"},
+  "consoleErrors": 0
+}

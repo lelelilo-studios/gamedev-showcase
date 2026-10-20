@@ -1,0 +1,12 @@
+{
+  "run": "node scripts/inspect.mjs showcases/01-claude-code-game-studios/ --steps s005.json (1440x900 and 390x844)",
+  "date": "2026-10-19T23:03-03:00",
+  "lossAt5DegreesOver_1s": 15,
+  "thawLogged": true,
+  "heldColdAllNight": {"result": "dawn", "state": "over", "score": 3000, "clock": "06:00"},
+  "bestAfterDawn": {"score": 3000, "seed": "20261019", "date": "2026-10-19"},
+  "enterOnPlayAgain": {"state": "playing", "t": 0.25, "seed": "20261019"},
+  "collectionForcedUnderHalf": {"result": "compromised", "state": "over", "collection": 1497, "clock": "22:02"},
+  "bestAfterLoss": "unchanged (3000)",
+  "consoleErrors": 0
+}

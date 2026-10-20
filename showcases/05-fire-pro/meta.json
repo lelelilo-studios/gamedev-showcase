@@ -1,0 +1,41 @@
+{
+  "no": "05",
+  "slug": "05-fire-pro",
+  "title": "Bucket Brigade",
+  "tagline": "Work the hand pump, aim the hose and keep a windy hill village's roofs wet until dawn.",
+  "summary": "Every burning roof in Bucket Brigade is a Fire Pro emitter driven by the game's own fire state, with the night's shifting wind as a Fire Pro force and the houses and hillside as colliders. It shows Fire Pro's sparse volumetric fire, smoke, bursts and ClusteredLighting working as the visual layer of a deterministic game in an ordinary three.js scene.",
+  "libraries": [
+    { "name": "threejs-fire-pro", "version": "0.1.0", "url": "https://cdn.jsdelivr.net/npm/threejs-fire-pro@0.1.0/dist-lib/threejs-fire-pro.js" },
+    { "name": "three", "version": "0.185.1", "url": "https://cdn.jsdelivr.net/npm/three@0.185.1/build/three.webgpu.js" }
+  ],
+  "fonts": ["League Gothic", "Libre Franklin"],
+  "palette": ["#0d1b3a", "#b3261c", "#c99a3e", "#f2e6c8", "#ffb45a", "#9dd2ff"],
+  "controls": [
+    { "action": "Aim", "keys": "mouse, or Q / E to jump between fires", "touch": "drag anywhere on the village" },
+    { "action": "Spray", "keys": "hold the mouse button or Space", "touch": "keep a thumb down" },
+    { "action": "Pump", "keys": "alternate A and D (or Left and Right)", "touch": "tap PUMP in a steady rhythm" },
+    { "action": "Pause", "keys": "Esc or P", "touch": "pause button" },
+    { "action": "Sound", "keys": "M", "touch": "speaker button" }
+  ],
+  "features": [
+    "One Fire Pro sphere emitter per burning roof: its radius, heat, smoke and lift follow the game's fire level, and spread or wind-blown embers start new emitters downwind (six live fires at most).",
+    "A Fire Pro wind force follows the night's wind plan, so flames lean and smoke drifts the way the bell-tower weathervane and the HUD dial point; a turbulence force adds licking detail.",
+    "Water hitting a fire triggers short Fire Pro bursts of steam; a doused roof keeps a smouldering smoke emitter for 14 seconds, and a fallen house smokes for a minute.",
+    "Each house is a closed, house-shaped mesh collider and each hill terrace a box collider, so smoke rolls over roofs and up the hill; a collapsed house swaps to a lower box.",
+    "ClusteredLighting gives every fire its own point light, so burning roofs light their neighbours, the cobbles and the brigade.",
+    "Burst emitters add the whoomp of a catching roof and the flare of a collapse.",
+    "A quality setting rebuilds the simulation with coarser voxels, fewer ray steps and halfResolution for laptop GPUs; auto picks low on integrated graphics and in previews, and drops a step if frames stay slow.",
+    "A ?mirror mode renders into an output render target and reads each frame back into a 2D canvas so headless Chrome can screenshot it."
+  ],
+  "skill_files_read": [],
+  "lessons": [
+    "Fire Pro needs the WebGPU device features shader-f16 and texture-formats-tier1. Chrome on Linux with an NVIDIA card (Vulkan) hides shader-f16 unless started with --enable-dawn-features=vulkan_enable_f16_on_nvidia, and headless screenshots need that toggle too. Check the adapter's features before importing, and say why in the fallback.",
+    "In a fresh headless page the first navigator.gpu.requestAdapter() can return null; three.js then quietly falls back to WebGL and Fire Pro throws 'requires a WebGPURenderer running the WebGPU backend'. Request the adapter yourself with a few retries and pass the device (with all adapter features) to new WebGPURenderer({ device }).",
+    "drawImage() of a WebGPU canvas is blank in headless Chrome. For ?mirror, use renderer.setOutputRenderTarget(rt), so tone mapping and sRGB still apply, then readRenderTargetPixelsAsync (rows are padded to 256 bytes) into a 2D canvas. Readbacks lag under load, so wait for a frame rendered after the moment you want before taking the screenshot.",
+    "An emitter inside a mesh collider is smothered: put sphere emitters just above the roof ridge and let the collider trim the bottom of the sphere. Mesh emitters need unit world scale (size them through geometry) and spread their heat over the surface, so they burn much weaker than spheres.",
+    "three's WebGPU renderer pays CPU time per draw call, more so while Fire Pro's lights change every frame. Merging the static village by material cut about 610 draws to about 260. Fire Pro also runs at most one solver step per update(), so on a slow frame the fluid slows down; keep the game rules in their own fixed-step simulation and let the fire follow."
+  ],
+  "deviations": "Screenshots and playtests ran with the inspect script's WEBGPU_FLAGS override, which adds --enable-dawn-features=vulkan_enable_f16_on_nvidia. Under the default --webgpu flags this machine's NVIDIA/Vulkan adapter has no shader-f16, which Fire Pro requires, so the page correctly shows its fallback (scripts/thumbs.sh needs the same override for this cartridge). Two design additions: the hoseman lobs the water over a roof that blocks the flat arc, and he aims off for wind drift.",
+  "browser_support": "needs WebGPU with the shader-f16 and texture-formats-tier1 features: a recent Chrome or Edge on Windows, macOS or ChromeOS, or Safari with WebGPU on. Chrome on Linux needs --enable-unsafe-webgpu --enable-features=Vulkan and, on NVIDIA, --enable-dawn-features=vulkan_enable_f16_on_nvidia. Every other browser gets a designed fallback page with a still of the game.",
+  "checked": "Headless Chrome on an RTX 4080 (Vulkan, with the f16 toggle) using ?mirror, at 1440x900 and 390x844, zero console errors and no sideways overflow. Full-night playtests with real input. Desktop: a mouse click on Play; A/D key strokes (8 took pressure from 0.33 to 0.86); E to jump to the next fire; Space and mouse-drag holds to spray (6 fires put out, all 11 houses standing at 2:43). P paused and froze sim time, then resumed. The night ran to dawn, the end report appeared with focus on Same night again, Enter replayed it and Esc paused it. Phone: taps on Play and PUMP, relative touch drags to aim and spray (first fire out by 1:05), the pause and resume buttons, through to the end report. Also checked: the how-to and settings modals by keyboard (Tab, Enter, Esc), rapid quality switching and back to auto, determinism (the same seed and inputs give an identical snapshot, in node and in the page), reduced motion, the index-style iframe preview (muted attract mode, two roofs burning, no corner label), phone landscape, and the fallback without WebGPU and with WebGPU but no shader-f16. Balance was tuned in node with scripted players: a weak bot saves about 6 houses, an average one 8, a good one 9 or more; doing nothing loses the village and usually the tower."
+}

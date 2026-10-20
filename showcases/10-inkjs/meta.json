@@ -1,0 +1,41 @@
+{
+  "no": "10",
+  "slug": "10-inkjs",
+  "title": "The Ninth-Floor Night Porter",
+  "tagline": "Answer nine bells through one hotel night, then rewrite the ink and rebind the book",
+  "summary": "A 9,000-word ink story that the inkjs compiler builds in the page at load, then runs line by line: tags drive the bell board, sounds and the sea outside; observed variables move the clock, tips and pockets; a thread is the pocket notebook. The script view edits that same ink, recompiles it with inkjs, shows compiler faults at their lines, and restarts the night from your rewrite.",
+  "libraries": [
+    { "name": "inkjs", "version": "2.4.0", "url": "https://cdn.jsdelivr.net/npm/inkjs@2.4.0/dist/ink-full.js" }
+  ],
+  "fonts": ["Alegreya", "Alegreya SC", "Kalam", "Courier Prime"],
+  "palette": ["#0c1829", "#f2e7cf", "#f2c066", "#bf9349", "#b8493d", "#23392f", "#4b1d25"],
+  "controls": [
+    { "action": "Choose", "keys": "1–9 or click", "touch": "tap the choice" },
+    { "action": "Hurry the ink", "keys": "Space or Enter", "touch": "tap the page" },
+    { "action": "Pocket notebook", "keys": "N", "touch": "notebook button" },
+    { "action": "Script view (edit and rebind)", "keys": "S; Ctrl+Enter rebinds", "touch": "script button" },
+    { "action": "Close the ledger (pause)", "keys": "Esc or P", "touch": "ledger button" },
+    { "action": "Sound", "keys": "M", "touch": "speaker button" }
+  ],
+  "features": [
+    "story.ink is compiled in the page with new inkjs.Compiler(source, options).Compile() every time it opens (a few hundred milliseconds for 9,000 words); the same compiler rebinds the reader's rewrite in the script view.",
+    "Line tags drive the interface: # entry opens a ledger hour, # bell drops a flag on the brass bell board, # sfx and # scene cue WebAudio sounds and the sea outside, # hand and # wire turn lines into pencil notes and pasted telegram strips.",
+    "ObserveVariable watches clock, tips, the pockets LIST and the clues LIST, so the clock hands, the tips tin, the pocket contents and the notebook's 'new notes' mark change at the moment the ink changes them.",
+    "The pocket notebook is a thread (<- notebook(-> here)) woven into every choice point; its choice carries a choice tag (#notebook), so the page offers it as the N button, sends its text to the notebook and returns to the same choices.",
+    "Tunnels run the bell board and the doors, and visit counts make the second knock at a door read differently; LIST operators (+=, ?, !?, ^, LIST_COUNT) decide what you carry and what you can say out loud.",
+    "SEED_RANDOM(seed), with the seed set through variablesState before the first line, makes the weather, shuffled lines and the race down the pier repeatable; state.ToJson() and LoadJson() save and continue the night.",
+    "EXTERNAL file_report(code, title) is bound with BindExternalFunction to file each of the eight endings, with an ink fallback function so the story also plays in Inky.",
+    "Compiler errors and warnings arrive through the CompilerOptions error handler as 'ERROR: line N: …' strings; the script view parses them into gutter marks, highlighted lines and a fault list that jumps to each line."
+  ],
+  "skill_files_read": [],
+  "lessons": [
+    "Gather and choice labels are scoped to the whole knot, not the stitch, and they share a namespace with VARs and LIST items: two '- (q)' labels in different stitches of one knot, or a stitch called 'seed' next to VAR seed, will not compile.",
+    "A divert from inside a knot back to that same knot does not count a new visit; only entering it from outside does. Give doors you knock on twice their own knots (here, tunnels) if the second visit should read differently.",
+    "A tag after a choice's closing bracket belongs to the output line, not the choice. Write [Consult the notebook #notebook] to get it in choice.tags. A bare '|' is not allowed inside a tag either.",
+    "Declared EXTERNAL functions throw on the first Continue() unless they are bound or story.allowExternalFunctionFallbacks is true, which matters for throwaway Story copies (this page runs one to read the seed's forecast for the title).",
+    "Variable observers fire during Continue(), before the page shows that line. If text is revealed over time, queue the observed changes with the line so the clock and pockets move when the reader reaches it."
+  ],
+  "deviations": "The house rules are written for action games, so a round here is one reading from midnight to six (about 12 minutes, 2,400–3,400 words) and the 'best score' is the best tips plus a collection of the eight endings. The corridor clock follows an observed clock variable (minutes after midnight) rather than a clock tag, so delays during the night move the hands; # entry tags put each hour in the ledger, and the page also honours a # clock tag in rewrites. The page fetches story.ink when served over http(s) and uses the identical embedded copy when opened from disk.",
+  "browser_support": "any modern browser",
+  "checked": "Node: compiled story.ink with inkjs 2.4.0 (no errors or warnings) and read 3,000 random nights with random seeds, opening the notebook at random: all eight endings reached, no runtime errors, every knot and stitch visited (with the pickpocket branch checked by a scripted path), the notebook never changes the choices it returns to, and 366 unique output lines pass a typography lint. Browser (scripts/inspect.mjs): read to all eight endings with real input at seed 7: Caught, Early Boat, Gone with the Tide and The Porter's Key with number keys at 1440×900, Trust the Porter with mouse clicks, and A Word at the Door, Not What They Seem and The Wrong Man with taps at 390×844, each ending in the morning report with tips and pearls matching the Node runs. Same seed and choices gave an identical ink state hash twice; another seed gave different weather. Script view: typed a fault with real keys, rebound, saw it marked at line 219, removed it with Backspace, rebound the original, typed a rewrite that appeared in the restarted ledger, then 'Back to the original' cleared it. Also checked the notebook, pause (Esc/P), how-to card, save and continue across a reload (same state hash), the phone notebook/pockets drawer, reduced motion, attract mode inside an iframe, opening from file://, the designed fallback when inkjs can't load, and 1024×768, 1920×1080 and 820×1180 layouts: zero console errors, zero failed requests, no sideways overflow."
+}

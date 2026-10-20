@@ -1,0 +1,45 @@
+# CCGS project configuration: single source of truth for project settings.
+# Written 2026-10-19 by /start (project.stage, modes.rigor, modes.automation).
+# The engine, commands and performance blocks were added by hand afterwards:
+# /setup-engine only knows Godot, Unity and Unreal, and this project has no engine.
+
+schema_version: 1
+
+framework:
+  version: 1.2.0            # the template's own value at commit 05ad7c8
+  last_upgraded: 2026-10-19
+
+project:
+  stage: Release            # /start set Concept (path B); /gate-check release passed 2026-10-19 and advanced it
+
+modes:
+  rigor: minimal            # /start Phase 4, inferred from "a small jam game"
+  automation: guided        # /start Phase 5, the human picked the recommended option
+  # review_mode is deliberately NOT written: rigor minimal expands it to `solo`
+  # (config-resolution.md, step 4). Writing it would pin it over the expansion.
+
+# --- added by hand (no /setup-engine run) -----------------------------------
+engine:
+  name: none                # a plain web page: HTML, Canvas 2D, WebAudio, no build step
+  version: n/a
+  language: JavaScript      # classic scripts, so the page also opens from file://
+  # Why none: the game has to live as one folder in a static showcase site
+  # (GitHub Pages, no build, no plugin) and open from disk. Every engine the
+  # studio supports would ship a WebAssembly export of several MB for a
+  # one-screen 2D game. The cost: no engine-reference docs, no engine
+  # specialist, no parse check; the run-and-observe check is done in a real
+  # browser instead.
+
+code_root: ..               # index.html and game.js sit next to studio/, not in src/
+                            # (the showcase index links the folder root)
+
+commands:
+  # run-and-observe launch: headless Chrome draws real frames (unlike Godot's
+  # --headless, which skips rendering), so a screenshot from it is a real look.
+  run: "node scripts/inspect.mjs showcases/01-claude-code-game-studios/ --out <scratch>/shots --wait 3000"
+  test: ""                  # none: qa.level minimal waives tests
+
+performance:
+  target_framerate: 60
+  frame_budget_ms: 16.67
+  enforce: warn

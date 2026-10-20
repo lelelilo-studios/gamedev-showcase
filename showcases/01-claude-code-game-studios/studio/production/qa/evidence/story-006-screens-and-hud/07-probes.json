@@ -1,0 +1,15 @@
+{
+  "run": "node scripts/inspect.mjs showcases/01-claude-code-game-studios/ --steps s006.json (1440x900, 390x844, 1280x720), s006t.json (390x844, touch only), s006b.json (1440x900, --reduced-motion)",
+  "date": "2026-10-19T23:15-03:00",
+  "titleOnLoad": {"state": "title", "demoNightRunning": true, "focus": "btn-play"},
+  "keyboard": {"tabEnterOpensHowToPlay": true, "focusInHowToPlay": "Back", "escClosesHowToPlay": true, "focusReturnsTo": "btn-play",
+               "enterStarts": "playing", "escPauses": {"state": "paused", "focus": "btn-resume", "clockFrozenFor1500ms": true}, "escResumes": "playing"},
+  "mute": {"M": "aria-pressed true", "stored": {"sound": false, "lowFx": false}},
+  "reducedMotion": {"lowFxToggleOnWithNothingStored": "true"},
+  "autoPause": {"windowBlur": "paused", "documentHidden": "paused"},
+  "touch390": {"tapStart": "playing", "tapBayB_keeperAt": {"x": 334, "floor": 2}, "holdWork1400ms_frost": [0.9, 0.0874], "tapPauseButton": "paused"},
+  "phoneScrollLockWhilePlaying": true,
+  "overflowX": {"1440x900": false, "390x844": false, "1280x720": false},
+  "gameApi": ["seed", "state", "start", "pause", "resume", "title", "step", "input", "snapshot", "debug"],
+  "consoleErrors": 0
+}

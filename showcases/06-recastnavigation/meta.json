@@ -1,0 +1,98 @@
+{
+  "no": "06",
+  "slug": "06-recastnavigation",
+  "title": "Sheepdog Trials",
+  "tagline": "Run a young collie round a fell-side trial: fetch the ewes, drive the gates, pen them.",
+  "summary": "Every ewe is a Detour crowd agent steering on a Recast navmesh built at load from the walls, gorse and the beck, so a frightened flock flows round obstacles and finds the only bridge by itself. The tile cache cuts the mesh live when hurdles are pitched in the Championship course and when the shepherd opens and shuts the pen.",
+  "libraries": [
+    {
+      "name": "@recast-navigation/core",
+      "version": "0.43.1",
+      "url": "https://cdn.jsdelivr.net/npm/@recast-navigation/core@0.43.1/dist/index.mjs"
+    },
+    {
+      "name": "@recast-navigation/generators",
+      "version": "0.43.1",
+      "url": "https://cdn.jsdelivr.net/npm/@recast-navigation/generators@0.43.1/dist/index.mjs"
+    },
+    {
+      "name": "@recast-navigation/wasm",
+      "version": "0.43.1",
+      "url": "https://cdn.jsdelivr.net/npm/@recast-navigation/wasm@0.43.1/dist/recast-navigation.wasm.js"
+    },
+    {
+      "name": "@recast-navigation/three",
+      "version": "0.43.1",
+      "url": "https://cdn.jsdelivr.net/npm/@recast-navigation/three@0.43.1/dist/index.mjs"
+    },
+    {
+      "name": "three",
+      "version": "0.186.1",
+      "url": "https://cdn.jsdelivr.net/npm/three@0.186.1/build/three.module.js"
+    }
+  ],
+  "fonts": [
+    "IM Fell English SC",
+    "IM Fell DW Pica",
+    "Reenie Beanie"
+  ],
+  "palette": [
+    "#f2e9d3",
+    "#25221c",
+    "#b13a25",
+    "#4f6a35",
+    "#d9a52a",
+    "#4a3420"
+  ],
+  "controls": [
+    {
+      "action": "Run",
+      "keys": "WASD / arrows",
+      "touch": "left thumb stick (floats to your thumb)"
+    },
+    {
+      "action": "Steady (creep)",
+      "keys": "hold Shift",
+      "touch": "push the stick half way, or the Steady button"
+    },
+    {
+      "action": "Lie down",
+      "keys": "let go",
+      "touch": "let go"
+    },
+    {
+      "action": "Bark",
+      "keys": "Space",
+      "touch": "Bark button"
+    },
+    {
+      "action": "Navmesh overlay",
+      "keys": "N",
+      "touch": "Navmesh chip"
+    },
+    {
+      "action": "Pause / mute",
+      "keys": "Esc or P / M",
+      "touch": "top-right buttons"
+    }
+  ],
+  "features": [
+    "Recast builds a tile-cache navmesh at load from simple proxy meshes of the field (walls as knife-edged prisms, gorse and boulders as cones, hurdles, pen) via threeToTileCache; the beck is cut out of the ground, so the clapper bridge is the only way over for the ewes",
+    "Every ewe, the shepherd and the setter-out are DetourCrowd agents; each step the game picks a ewe's target from fear of the dog, flocking, following its neighbours and grazing, and the crowd does the steering and separation",
+    "Frightened ewes raycast along the navmesh, slide along walls or fan out of corners, and take a short Detour path through an opening when driven at one: the bridge, the gate being run, the pen mouth",
+    "Tile-cache box obstacles cut the mesh live: hurdles pitched at set times in the Championship, and the pen gate, shut until the shepherd opens it and shut again behind the last ewe",
+    "A second, tiled navmesh with the beck left walkable plans the dog's own routes in attract mode, because the dog wades where the ewes can't",
+    "N draws the Detour polygons and walls, the tiles queued for tileCache.update and rebuilt, each ewe's corridor corners and target, and the dog's pressure circle"
+  ],
+  "skill_files_read": [],
+  "lessons": [
+    "In generateTileCache the walkableHeight, walkableClimb and walkableRadius config values are in voxel units (cells), not world units: multiply by ch or cs to think in metres",
+    "Give obstacles in the Recast input sloped or knife-edge tops (prisms, cones): flat-topped wall boxes or gorse cylinders leave walkable islands on top that findClosestPoint will happily snap a target onto",
+    "tileCache.update rebuilds one tile per call; call it every fixed step until it reports upToDate, and compare navMesh.getTileRefAt before and after to know which tiles were rebuilt",
+    "Flock behaviour lives or dies on the targets you feed requestMoveTarget: ewes that only flee inside a tight flight zone move in stop-start pulses; a wider, softer awareness zone plus 'follow your neighbours' makes the flock flow",
+    "generateSoloNavMesh crashed in buildPolyMeshDetail for a field this size; the tiled generator handled the same input fine"
+  ],
+  "deviations": "The beck is unwalkable for the ewes only: the dog wades it at half speed, so the field stays quick to cross. In course III the hurdles lie flat in the grass and are pitched upright at the set times printed on the plan, rather than carried in by the shepherd, who is holding the pen. The pen gate starts shut and the shepherd opens it when he reaches it, so ewes can't drift into the pen early. To keep penning playable, calm ewes near the pen follow the first ones in along a Detour path through the mouth. The page imports @recast-navigation/core, generators, wasm and three directly; the recast-navigation umbrella package only re-exports them.",
+  "browser_support": "Any modern browser with WebGL 2 and WebAssembly (Chrome, Edge, Firefox, Safari 15+); touch controls on phones.",
+  "checked": "scripts/inspect.mjs at 1440x900 and 390x844: 0 console errors, 0 failed requests, no sideways overflow; also 2560x1080, 1280x720 and 1024x700 (title fits), --reduced-motion (calm mode on), and the title running as attract mode inside an iframe. Desktop playtest (seed 3): How to play and Play opened with Tab-focus + Enter, arrow keys and A moved the dog, Space barked, M muted, Esc paused and resumed, N toggled the overlay, then steering through __game.input(__game.suggest()) penned all 12 at 3:12 for 74 points and Enter on Play again started a new run. Phone playtest (seed 3, touch emulation): real taps on Play, How to play, Bark, Steady, Plan, Navmesh and pause/resume, touch drags on the floating stick moved the dog up and left, and the steered run penned all 12 at 2:26 for 92 points. Same seed + same inputs gave an identical snapshot over two runs. Batches of the built-in autopilot over several seeds finish most runs on all three courses (others end with most of the flock penned); hurdles pitched as tile-cache obstacles and tiles rebuilt via tileCache.update were confirmed by probe. Every screenshot was looked at."
+}

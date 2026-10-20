@@ -1,0 +1,112 @@
+{
+  "no": "09",
+  "slug": "09-meshoptimizer",
+  "title": "Draw Distance",
+  "tagline": "Glide a wooden sailplane through six hoops and land on the meadow before sunset",
+  "summary": "Every tree and stone in a 63,000-instance forest gets a four-level LOD chain built in the browser by meshoptimizer at load, and each frame the game picks a level per instance from the simplifier's own error converted to pixels, so a live panel shows about 98 % of the full-detail triangles never being drawn. A Workshop re-simplifies one specimen from sliders and shows what reorderMesh does to vertex-cache misses and what the encoder does to its size.",
+  "libraries": [
+    {
+      "name": "meshoptimizer (simplifier)",
+      "version": "1.3.0",
+      "url": "https://cdn.jsdelivr.net/npm/meshoptimizer@1.3.0/meshopt_simplifier.js"
+    },
+    {
+      "name": "meshoptimizer (encoder)",
+      "version": "1.3.0",
+      "url": "https://cdn.jsdelivr.net/npm/meshoptimizer@1.3.0/meshopt_encoder.js"
+    },
+    {
+      "name": "meshoptimizer (decoder)",
+      "version": "1.3.0",
+      "url": "https://cdn.jsdelivr.net/npm/meshoptimizer@1.3.0/meshopt_decoder.mjs"
+    },
+    {
+      "name": "three",
+      "version": "0.186.1",
+      "url": "https://cdn.jsdelivr.net/npm/three@0.186.1/build/three.module.js"
+    }
+  ],
+  "fonts": [
+    "Bellefair",
+    "Sofia Sans Extra Condensed",
+    "Sofia Sans Semi Condensed"
+  ],
+  "palette": [
+    "#1c1a14",
+    "#f1e8d6",
+    "#e6d3ae",
+    "#e2552b",
+    "#f0b25a",
+    "#6fb59a",
+    "#7c95c8",
+    "#22392f"
+  ],
+  "controls": [
+    {
+      "action": "Bank",
+      "keys": "A / D or ← / →",
+      "touch": "left thumb stick, sideways"
+    },
+    {
+      "action": "Pitch",
+      "keys": "W / S or ↑ / ↓ (invertible in Settings)",
+      "touch": "left thumb stick, up and down"
+    },
+    {
+      "action": "Stick with the mouse",
+      "keys": "hold the button and drag",
+      "touch": "—"
+    },
+    {
+      "action": "Dive",
+      "keys": "Shift (hold)",
+      "touch": "Dive button"
+    },
+    {
+      "action": "Air brake",
+      "keys": "Space (hold)",
+      "touch": "Brake button"
+    },
+    {
+      "action": "Tint trees by LOD",
+      "keys": "L",
+      "touch": "L chip on the triangle panel"
+    },
+    {
+      "action": "Freeze LOD choice",
+      "keys": "F",
+      "touch": "F chip on the triangle panel"
+    },
+    {
+      "action": "Pause",
+      "keys": "Esc or P",
+      "touch": "pause button, top right"
+    },
+    {
+      "action": "Mute",
+      "keys": "M",
+      "touch": "speaker button, top right"
+    }
+  ],
+  "features": [
+    "At load, six procedural specimens (396 to 5,120 triangles) each get three cheaper copies, two from MeshoptSimplifier.simplify with Prune and a far one from simplifySloppy. A fir, for example, goes 3,006 → 600 → 194 → 45 triangles. The loading sheet draws each copy's wireframe, triangle count and error as it is made.",
+    "Every level's index buffer goes through MeshoptEncoder.reorderMesh for the vertex cache (about 1.0 → 0.6 misses per triangle in a 16-entry FIFO) and gets its own compacted vertex buffer.",
+    "The 300 × 500 terrain grid is simplified once with simplifyWithAttributes (ErrorAbsolute, LockBorder, colour as an attribute), from 300,000 to about 74,000 triangles within 1 m.",
+    "Each frame, 63,000 instances are sorted into 24 instanced meshes by screen-space error. A level's switch distance is its simplifier error (scaled by getScale) turned into pixels at the current viewport height and field of view, with a dithered cross-fade between levels.",
+    "An instrument-panel readout compares renderer.info triangles and draw calls with the full-detail cost of the same view, shadow pass included. A desktop frame typically draws 2 to 3 M triangles where full detail would cost 75 to 115 M.",
+    "L tints every tree by its level. F freezes each tree's level where you pressed it, so you can turn back and fly past the far copies up close.",
+    "The Workshop re-simplifies a specimen from two sliders (target triangles, error limit) with either method, lays the wireframe over the original, and replays the draw order so you can watch vertex-cache misses before and after reorderMesh.",
+    "The Workshop also sizes the result as float32, quantised (encodeFilterOct normals), meshopt-encoded and gzipped, and checks that MeshoptDecoder gives back every byte and triangle."
+  ],
+  "skill_files_read": [],
+  "lessons": [
+    "simplify cannot cross topology, so a mesh built from many closed shells (tiers, tufts) gets stuck early under its error cap. Model a conifer crown as one welded lathe surface. For the far level use simplifySloppy, but check its output: it can return far fewer triangles than asked (zero on thin trunks) or stop at its error cap. Retry with a bigger target or cap until it is really smaller than the level before.",
+    "The index codec keeps every triangle and its winding but may rotate where each triangle starts, so a decode round trip has to compare triangles up to rotation, not raw bytes.",
+    "Switch distances can come straight from the simplifier: absolute error = relative error × getScale(positions), and a level is good beyond d = absErr × (viewportHeight / (2·tan(fov/2))) / tolerancePx. Measure in CSS pixels, or high-DPI screens pay twice for detail nobody can see.",
+    "three r186 applies fog after tone mapping and colour-space conversion, so a custom haze chunk mixes in display space. Keep the haze and sky colours as literal sRGB values (Color.setStyle(hex, LinearSRGBColorSpace)) or the horizon won't meet the hazed terrain.",
+    "A shared onBeforeCompile wrapper gives every material the same default program cache key, so material variants silently share the wrong shader. Give each variant its own customProgramCacheKey."
+  ],
+  "deviations": "Mouse steering is drag-to-steer: you press anywhere and drag like a stick, so a mouse left lying still never banks the glider. Space was added as an air brake for the approach. F freezes each tree's level of detail but leaves culling live, so trees behind you still appear, at the level they had when you pressed it.",
+  "browser_support": "Any current desktop or mobile browser with WebGL 2 and WebAssembly. There is a designed fallback screen when either is missing.",
+  "checked": "I played full rounds with scripts/inspect.mjs. At 1440×900 with keyboard and mouse: menu clicks, the How to fly and Settings cards, the Workshop (slider drag, method toggle, draw-order replay), real arrow and Shift key holds, L and F by key and by clicking the panel chip, Esc to pause and resume, and Enter on the logbook to fly again. At 390×844 with touch: tap Fly, drag the left-thumb stick right and up, hold Dive, tap the L and F chips, pause and resume by tap. For the long flight, from release over all six hoops to the landing and the logbook, an injected autopilot steered through __game.input. Probes confirmed that bank, pitch and dive respond, that the sim time stands still while paused, that the hoops, touchdown and end state register, and that a new flight starts fresh. Zero console errors, no failed requests and no sideways overflow at either size. I also checked determinism (two runs with the same seed and inputs give identical snapshots), prefers-reduced-motion (reduce flashing on, CSS animations off), the iframe preview (muted attract flight with the LOD tint flickering on, corner label hidden) and the fallback card. In Node, the autopilot flew six seeds against the page's own flight code: five landed cleanly, and on the sixth the test pilot itself misjudged an approach over the trees. Input during loading is ignored until the title is on screen. Hammering real Enter presses (and taps on the phone) from page load onwards goes loading → title → playing at both sizes, with no screen left over the flight. Headless Chrome renders on the CPU, so frame rate was not measured; triangle and draw-call counts were read from renderer.info."
+}

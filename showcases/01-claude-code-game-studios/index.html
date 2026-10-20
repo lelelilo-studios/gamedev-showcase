@@ -1,0 +1,368 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Hold the Cold</title>
+<meta name="description" content="Night shift at the Hesper Fell seed vault. A storm, three frozen bays, one keeper: keep the seeds below the thaw line until six.">
+<meta property="og:title" content="Hold the Cold">
+<meta property="og:description" content="Night shift at the Hesper Fell seed vault: scrape frozen coolers, haul fuel in from the blizzard and crank the generator until dawn.">
+<meta property="og:image" content="../../thumbs/01-claude-code-game-studios.webp">
+<meta name="theme-color" content="#0d1424">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%230d1424'/%3E%3Crect x='13' y='4' width='6' height='17' rx='3' fill='%23eef7fa'/%3E%3Crect x='15' y='12' width='2' height='10' fill='%23ffb03a'/%3E%3Ccircle cx='16' cy='23' r='5' fill='%23ffb03a'/%3E%3Cpath d='M21 8h4M21 12h3M21 16h4' stroke='%23bfe6f0' stroke-width='1.6'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Stencil:wght@600;800&family=Martian+Mono:wght@400;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Courier+Prime:wght@400;700&family=Reenie+Beanie&display=swap" rel="stylesheet">
+<link href="binder.css" rel="stylesheet">
+<style>
+:root {
+  --ink: #0d1424;
+  --ink-2: #16203a;
+  --rock: #182238;
+  --frost: #bfe6f0;
+  --snow: #eef7fa;
+  --amber: #ffb03a;
+  --sodium: #f08a24;
+  --alarm: #ff5b4a;
+  --go: #9be0a0;
+  --display: 'Big Shoulders Stencil', 'Arial Narrow', sans-serif;
+  --mono: 'Martian Mono', ui-monospace, monospace;
+  --tag-ink: #eef7fa;
+  --tag-paper: rgba(13, 20, 36, 0.86);
+  --tag-line: rgba(191, 230, 240, 0.28);
+  --top: 108px;          /* phone: the HUD band above the vault */
+  --bottom: 112px;       /* phone: the thumb band below it */
+  --panel: clamp(190px, calc((100vw - 68.2svh) / 2 - 56px), 330px);
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; background: var(--ink); color: var(--snow); }
+body { font-family: var(--mono); font-size: 13px; -webkit-tap-highlight-color: transparent; }
+html.locked, html.locked body { overflow: hidden; overscroll-behavior: none; }
+button { font: inherit; color: inherit; }
+:focus-visible { outline: 3px solid var(--amber); outline-offset: 3px; }
+.sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+
+/* ------------------------------------------------------------ the game section */
+.game { position: relative; height: 100vh; height: 100svh; min-height: 560px; overflow: hidden; background: var(--ink); isolation: isolate; }
+.game canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; touch-action: none; }
+.field { position: absolute; left: 8px; right: 8px; top: var(--top); bottom: var(--bottom); pointer-events: none; }
+.game::after { content: ''; position: absolute; inset: 0; pointer-events: none; opacity: .13; mix-blend-mode: overlay; z-index: 1;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 .9 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E"); }
+
+.prompt { position: absolute; left: 0; top: 0; pointer-events: none; white-space: nowrap; z-index: 3;
+  font: 600 11px/1 var(--mono); letter-spacing: .02em; color: var(--ink); background: var(--snow);
+  padding: 6px 8px 5px; border-radius: 3px; box-shadow: 2px 2px 0 var(--sodium); }
+
+/* HUD: a top band on phones, two side panels on wide screens */
+.hud { position: absolute; z-index: 2; }
+.hud-main { left: 0; right: 0; top: 0; height: var(--top); padding: 10px 12px 0 14px;
+  display: grid; grid-template-columns: auto 1fr; grid-template-rows: auto auto; column-gap: 14px; row-gap: 6px; align-content: start;
+  background: linear-gradient(var(--ink) 70%, rgba(13,20,36,0)); pointer-events: none; }
+.kicker { display: none; margin: 0; font: 600 10px/1.3 var(--mono); letter-spacing: .14em; text-transform: uppercase; color: #8796b8; }
+.clock { font: 800 40px/0.9 var(--display); color: var(--snow); letter-spacing: .01em; font-variant-numeric: tabular-nums; align-self: start; }
+.clock small { display: block; font: 600 9px/1.4 var(--mono); letter-spacing: .12em; color: #8796b8; text-transform: uppercase; }
+.coll-wrap { padding-right: 96px; min-width: 0; }
+.coll { font: 400 11px/1.2 var(--mono); color: var(--frost); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.coll b { display: inline-block; font: 600 17px/1 var(--mono); color: var(--snow); margin-right: .3em; font-variant-numeric: tabular-nums; }
+.coll .long { display: none; }
+.coll-bar { --v: 1; position: relative; height: 7px; background: #26324c; margin-top: 5px; }
+.coll-bar i { position: absolute; inset: 0; transform-origin: left; transform: scaleX(var(--v)); background: var(--frost); }
+.coll-bar.low i { background: var(--alarm); }
+.coll-bar em { position: absolute; left: 50%; top: -3px; bottom: -3px; width: 2px; background: var(--amber); }
+.meters { display: flex; gap: 12px; grid-column: 1 / -1; }
+.meter { --v: 1; display: grid; gap: 4px; flex: 1; min-width: 0; font: 600 9px/1 var(--mono); text-transform: uppercase; letter-spacing: .08em; color: #8796b8; }
+.meter span { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.meter i { height: 6px; background: #26324c; position: relative; display: block; }
+.meter i::after { content: ''; position: absolute; inset: 0; transform-origin: left; transform: scaleX(var(--v)); background: var(--amber); }
+.meter.low i::after { background: var(--alarm); }
+.meter.storm i::after { background: var(--frost); }
+.meter b { color: var(--snow); font-weight: 600; }
+
+.hud-side { right: 10px; top: 10px; pointer-events: none; }
+.hud-buttons { display: flex; gap: 6px; justify-content: flex-end; pointer-events: auto; }
+.icon-btn { width: 40px; height: 40px; display: grid; place-items: center; border: 1px solid rgba(191,230,240,.3); background: rgba(13,20,36,.6);
+  border-radius: 4px; cursor: pointer; padding: 0; }
+.icon-btn svg { width: 18px; height: 18px; fill: none; stroke: var(--snow); stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.icon-btn[aria-pressed="true"] .wave { display: none; }
+.icon-btn[aria-pressed="false"] .cross { display: none; }
+.log-title, .keys-card { display: none; }
+.log { margin: 0; padding: 0; list-style: none; font: 400 11px/1.45 var(--mono); color: var(--frost); }
+.hud-side .log { display: none; }
+.log li { padding: 4px 0; border-bottom: 1px solid rgba(191,230,240,.12); }
+.log li:first-child { color: var(--snow); }
+.log time { color: var(--amber); margin-right: .45em; }
+.log .ev-stall, .log .ev-dry, .log .ev-collapse, .log .ev-thaw, .log .ev-lost { color: #ff9a8e; }
+.log .ev-restart, .log .ev-cold, .log .ev-dawn { color: var(--go); }
+/* phones: the log is one ticker line under the HUD */
+.ticker { position: absolute; z-index: 2; left: 14px; right: 14px; top: calc(var(--top) - 22px); margin: 0; pointer-events: none;
+  font: 400 11px/1.3 var(--mono); color: var(--frost); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.ticker time { color: var(--amber); margin-right: .45em; }
+
+.touchbar { position: absolute; z-index: 2; left: 0; right: 0; bottom: 0; height: var(--bottom);
+  display: none; align-items: center; justify-content: flex-end; gap: 12px; padding: 0 14px calc(6px + env(safe-area-inset-bottom)) 168px; }
+@media (any-pointer: coarse) { .touchbar { display: flex; } }
+.touch-hint { margin: 0; flex: 1; font: 400 10px/1.5 var(--mono); color: #8796b8; text-align: right; white-space: nowrap; }
+.work-btn { width: 92px; height: 92px; border-radius: 50%; border: 0; background: var(--amber); color: var(--ink); cursor: pointer;
+  font: 800 22px/1 var(--display); letter-spacing: .06em; box-shadow: 4px 4px 0 var(--sodium), inset 0 0 0 3px rgba(13,20,36,.25);
+  touch-action: none; user-select: none; -webkit-user-select: none; flex: none; }
+.work-btn.held { transform: translate(2px, 2px); box-shadow: 2px 2px 0 var(--sodium), inset 0 0 0 3px rgba(13,20,36,.25); }
+.work-btn small { display: block; font: 600 8px/1.2 var(--mono); letter-spacing: .1em; }
+
+@media (min-aspect-ratio: 5/4) {
+  .field { left: 0; right: 0; top: 18px; bottom: 18px; }
+  .hud-main { left: 28px; right: auto; top: 26px; height: auto; width: var(--panel); background: none; padding: 0;
+    display: flex; flex-direction: column; gap: 12px; }
+  .kicker { display: block; }
+  .clock { font-size: clamp(48px, 6vw, 76px); }
+  .clock small { font-size: 10px; }
+  .coll-wrap { padding: 0; } .coll .long { display: inline; }
+  .coll { white-space: normal; } .coll b { display: block; font-size: 26px; margin-bottom: 2px; }
+  .meters { flex-direction: column; gap: 10px; }
+  .meter { font-size: 10px; } .meter i { height: 8px; }
+  .hud-side { right: 28px; top: 26px; bottom: 26px; width: var(--panel); display: flex; flex-direction: column; gap: 12px; }
+  .hud-side .log { display: block; overflow: hidden; flex: 0 1 auto; }
+  .log-title { display: block; margin: 8px 0 0; font: 800 18px/1 var(--display); letter-spacing: .06em; text-transform: uppercase; color: #8796b8; }
+  .keys-card { display: grid; grid-template-columns: auto 1fr; gap: 4px 10px; margin: auto 0 0; padding: 12px 0 0;
+    border-top: 1px solid rgba(191,230,240,.15); font: 400 10px/1.4 var(--mono); color: #8796b8; }
+  .keys-card dt { color: var(--snow); font-weight: 600; }
+  .keys-card dd { margin: 0; }
+  .ticker { display: none; }
+  .touchbar { left: auto; width: 140px; right: 20px; height: 140px; padding: 0; justify-content: center; }
+  .touch-hint { display: none; }
+}
+@media not (any-pointer: coarse) { :root { --bottom: 24px; } }
+/* the title is a poster: the demo night's HUD stays out of it */
+.game.is-title .hud, .game.is-title .ticker, .game.is-title .touchbar { visibility: hidden; }
+
+/* ------------------------------------------------------------ screens */
+.screen { position: absolute; inset: 0; z-index: 20; display: grid; place-items: center; padding: 16px; background: rgba(7,12,24,.74); overflow-y: auto; }
+.screen[hidden] { display: none; }
+.card { background: var(--snow); color: var(--ink); width: 100%; max-width: 440px; padding: 22px 22px 18px; box-shadow: 6px 6px 0 var(--sodium); }
+.card h2 { font: 800 40px/0.95 var(--display); margin: 0 0 10px; text-transform: uppercase; text-wrap: balance; }
+.card p { font: 400 12px/1.55 var(--mono); margin: 0 0 12px; }
+.btn-row { display: flex; flex-wrap: wrap; gap: 10px; margin: 14px 0 0; }
+.btn { font: 800 20px/1 var(--display); text-transform: uppercase; letter-spacing: .04em; background: var(--ink); color: var(--snow);
+  border: 0; padding: 12px 18px 11px; cursor: pointer; }
+.btn.ghost { background: transparent; color: var(--ink); box-shadow: inset 0 0 0 2px var(--ink); }
+.btn.primary { background: var(--ink); box-shadow: 3px 3px 0 var(--amber); }
+.btn:hover { filter: brightness(1.15); }
+.toggles { display: flex; flex-wrap: wrap; gap: 8px; margin: 12px 0 0; }
+.toggle { display: inline-flex; align-items: center; gap: 8px; border: 1px solid rgba(13,20,36,.35); background: transparent; padding: 7px 10px 6px;
+  font: 600 10px/1 var(--mono); letter-spacing: .06em; text-transform: uppercase; cursor: pointer; color: var(--ink); }
+.toggle::before { content: ''; width: 10px; height: 10px; border: 2px solid var(--ink); }
+.toggle[aria-pressed="true"]::before { background: var(--ink); box-shadow: inset 0 0 0 2px var(--snow); }
+.fine { font: 400 10px/1.5 var(--mono) !important; color: #4a5a7a; margin: 12px 0 0 !important; }
+.fine a { color: inherit; }
+.seedline { display: flex; flex-wrap: wrap; align-items: baseline; gap: 6px 12px; font: 400 11px/1.4 var(--mono); margin: 14px 0 0; }
+.seedline b { font-weight: 600; }
+.linkish { background: none; border: 0; padding: 0; text-decoration: underline; cursor: pointer; font: 600 11px/1.4 var(--mono); color: var(--ink); }
+
+/* the title: a printed poster over the vault running on its own */
+.title { background: linear-gradient(90deg, rgba(7,12,24,.86), rgba(7,12,24,.35) 70%, rgba(7,12,24,.1)); place-items: end start; }
+.title .card { max-width: 470px; background: transparent; color: var(--snow); box-shadow: none; padding: 8px 8px 8px 12px; }
+.title h1 { margin: 0; font: 800 clamp(64px, 17vw, 132px)/0.82 var(--display); text-transform: uppercase; letter-spacing: -.005em;
+  color: var(--snow); text-shadow: 4px 4px 0 var(--sodium); }
+.title .kicker { display: block; color: var(--amber); margin: 0 0 10px; text-wrap: balance; }
+.nw { white-space: nowrap; }
+.title .hook { font: 400 13px/1.6 var(--mono); margin: 16px 0 0; max-width: 34em; color: var(--frost); }
+.title .btn.primary { background: var(--amber); color: var(--ink); box-shadow: 4px 4px 0 var(--sodium); font-size: 24px; }
+.title .btn.ghost { color: var(--snow); box-shadow: inset 0 0 0 2px var(--snow); }
+.title .toggle { color: var(--snow); border-color: rgba(238,247,250,.35); }
+.title .toggle::before { border-color: var(--snow); }
+.title .toggle[aria-pressed="true"]::before { background: var(--snow); box-shadow: inset 0 0 0 2px var(--ink); }
+.title .seedline { color: var(--frost); } .title .linkish { color: var(--snow); }
+.title .fine { color: #8796b8; }
+.title .best { font: 400 11px/1.4 var(--mono); color: var(--frost); margin: 6px 0 0; }
+@media (min-aspect-ratio: 5/4) {
+  .title { place-items: center start; padding: 16px 16px 60px max(24px, 3vw); }
+  .title .card { max-width: max(320px, calc((100vw - 68.2svh) / 2 - 3vw - 36px)); }
+  .title h1 { font-size: clamp(56px, min(9.5vw, 14svh), 132px); }
+}
+@media (max-aspect-ratio: 5/4) { .title { background: linear-gradient(0deg, rgba(7,12,24,.95) 45%, rgba(7,12,24,.25)); padding-bottom: 60px; } }
+
+.rules { margin: 0 0 12px; padding: 0 0 0 1.3em; font: 400 12px/1.55 var(--mono); }
+.rules li { margin: 0 0 6px; } .rules li::marker { font-weight: 600; }
+.controls { width: 100%; border-collapse: collapse; font: 400 11px/1.4 var(--mono); }
+.controls th, .controls td { text-align: left; padding: 5px 6px 5px 0; border-bottom: 1px dashed rgba(13,20,36,.25); vertical-align: top; }
+.controls th { font-weight: 600; white-space: nowrap; }
+.controls thead th { font: 800 14px/1 var(--display); text-transform: uppercase; letter-spacing: .05em; color: #4a5a7a; }
+.pause .card h2 small { display: block; font: 600 12px/1.4 var(--mono); letter-spacing: .1em; color: #4a5a7a; }
+
+/* the end of the night */
+.end-card .end-line { margin: 0 0 14px; }
+.end-score { margin: 0 0 12px !important; } .end-score b { font: 800 56px/1 var(--display); }
+.end-bays, .end-stats { list-style: none; margin: 0 0 12px; padding: 0; font: 400 12px/1.6 var(--mono); }
+.end-bays { display: flex; gap: 16px; } .end-bays li { display: grid; } .end-bays b { font-weight: 600; }
+.end-stats li { display: flex; justify-content: space-between; border-bottom: 1px dashed rgba(13,20,36,.25); }
+.end-best { font: 400 11px/1.4 var(--mono) !important; margin: 0 !important; }
+.end.lost .card { box-shadow: 6px 6px 0 var(--alarm); }
+
+.binder-cue { font: 400 11px/1.5 var(--mono); color: var(--frost); margin: 10px 0 0; }
+.binder-cue a { color: var(--amber); font-weight: 600; }
+.binder-cue.dark { color: #4a5a7a; } .binder-cue.dark a { color: var(--ink); }
+.card .binder-cue.dark { margin: 14px 0 0; }        /* clear of the button row on the pause and end cards */
+.scroll-cue { position: absolute; z-index: 21; left: 50%; bottom: 10px; transform: translateX(-50%); display: none;
+  font: 600 10px/1 var(--mono); letter-spacing: .14em; text-transform: uppercase; color: var(--frost); text-decoration: none;
+  padding: 8px 12px; border: 1px solid rgba(191,230,240,.25); background: rgba(13,20,36,.6); }
+.scroll-cue:hover { color: var(--snow); border-color: var(--frost); }
+@media (min-aspect-ratio: 5/4) { .game.is-title .scroll-cue { display: block; } }
+/* inside the index's live preview: a quiet poster, no controls */
+html.embedded .title .btn-row, html.embedded .title .toggles, html.embedded .title .seedline, html.embedded .title .fine,
+html.embedded .title .best, html.embedded .hud-side, html.embedded .touchbar, html.embedded .binder-cue, html.embedded .scroll-cue,
+html.embedded .binder { display: none !important; }
+html.embedded .game { min-height: 0; }
+@media (prefers-reduced-motion: reduce) { .work-btn.held { transform: none; } }
+</style>
+</head>
+<body>
+<main>
+  <section class="game" id="game" aria-label="Hold the Cold, the game">
+    <canvas id="view" role="img" aria-label="Cutaway of the Hesper Fell seed vault: the fuel shed outside, the portal tunnel, the generator hall and three seed bays"></canvas>
+    <div class="field" id="field"></div>
+    <div id="prompt" class="prompt" hidden></div>
+
+    <header class="hud hud-main" aria-hidden="true">
+      <p class="kicker">Night shift · Hesper Fell</p>
+      <div class="clock"><span id="clock">22:00</span><small id="clock-sub">shift begins</small></div>
+      <div class="coll-wrap">
+        <div class="coll"><b id="coll">3,000</b><span>of 3,000<span class="long"> accessions frozen</span></span></div>
+        <div class="coll-bar" id="m-coll" title="Below the amber line the vault is lost"><i></i><em></em></div>
+      </div>
+      <div class="meters">
+        <div class="meter storm" id="m-storm"><span>Storm <b id="storm-word">rising</b></span><i></i></div>
+        <div class="meter" id="m-warm"><span>Warmth</span><i></i></div>
+        <div class="meter" id="m-fuel"><span>Fuel <b id="fuel-pct">58%</b></span><i></i></div>
+      </div>
+    </header>
+    <p class="ticker" id="ticker" aria-hidden="true"></p>
+
+    <aside class="hud hud-side">
+      <div class="hud-buttons">
+        <button type="button" class="icon-btn" id="btn-mute" aria-label="Sound (M)" aria-pressed="false">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9h4l5-4v14l-5-4H4z"/><path class="wave" d="M16 9a4 4 0 0 1 0 6M18.5 6.5a7.5 7.5 0 0 1 0 11"/><path class="cross" d="M16 9l5 6M21 9l-5 6"/></svg>
+        </button>
+        <button type="button" class="icon-btn" id="btn-pause" aria-label="Pause (Esc)">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5v14M16 5v14"/></svg>
+        </button>
+      </div>
+      <h2 class="log-title">Shift log</h2>
+      <ol class="log" id="log" aria-label="Shift log"></ol>
+      <dl class="keys-card">
+        <dt>A D / ← →</dt><dd>walk</dd>
+        <dt>W S / ↑ ↓</dt><dd>climb (walks to the ladder)</dd>
+        <dt>Space / E</dt><dd>work: hold to scrape and pour, press to crank</dd>
+        <dt>Click</dt><dd>walk there; hold on a machine to work it</dd>
+        <dt>Esc · M</dt><dd>pause · sound</dd>
+      </dl>
+    </aside>
+
+    <div class="touchbar" id="touchbar">
+      <p class="touch-hint">tap: walk<br>hold: work</p>
+      <button type="button" class="work-btn" id="btn-work" aria-label="Work: hold to scrape or pour, tap to crank">WORK<small>hold</small></button>
+    </div>
+
+    <!-- title -->
+    <div class="screen title" id="scr-title" role="dialog" aria-labelledby="title-h" aria-describedby="title-hook">
+      <div class="card">
+        <p class="kicker">Hesper Fell Seed Vault · <span class="nw">night shift</span></p>
+        <h1 id="title-h">Hold<br>the Cold</h1>
+        <p class="hook" id="title-hook">A storm, three frozen bays and one keeper. Keep the seeds below <span class="nw">−10&nbsp;°C</span> until the relief crew comes at six.</p>
+        <div class="btn-row">
+          <button type="button" class="btn primary" id="btn-play">Start the shift</button>
+          <button type="button" class="btn ghost" data-open="how">How to play</button>
+        </div>
+        <div class="toggles">
+          <button type="button" class="toggle" data-setting="sound" aria-pressed="true">Sound</button>
+          <button type="button" class="toggle" data-setting="lowFx" aria-pressed="false">Reduce flashing</button>
+        </div>
+        <p class="seedline">Seed <b id="seed-title">—</b> <span id="seed-kind">today's storm</span> <button type="button" class="linkish" id="btn-newseed">New seed</button></p>
+        <p class="best" id="best-title">Best night: none yet</p>
+        <p class="binder-cue"><a href="#binder" data-open-binder>Open the studio binder</a>: the paperwork Claude Code Game Studios wrote while making this game.</p>
+        <p class="fine">Made with the <a href="https://github.com/Donchitos/Claude-Code-Game-Studios" target="_blank" rel="noopener">Claude Code Game Studios</a> workflow (MIT). Type: Big Shoulders Stencil and Martian Mono (SIL OFL). Every picture and sound is drawn in code.</p>
+      </div>
+    </div>
+
+    <!-- how to play -->
+    <div class="screen how" id="scr-how" hidden role="dialog" aria-labelledby="how-h">
+      <div class="card">
+        <h2 id="how-h">How the night goes</h2>
+        <ol class="rules">
+          <li>Keep every bay below <b><span class="nw">−10&nbsp;°C</span></b>. A cooler that frosts over stops cooling: stand at it and hold Work to scrape it clear.</li>
+          <li>The generator drinks fuel. Cans are in the shed outside, where the cold gets into you. Bring one down and hold Work to pour.</li>
+          <li>When it coughs, it is about to stall. Crank it: press Work while the needle is in the green, three times. A miss costs one.</li>
+          <li>Above <span class="nw">−10&nbsp;°C</span> seeds die by the second. Fall below half the collection and the vault is lost. Make it to 06:00.</li>
+        </ol>
+        <table class="controls">
+          <thead><tr><th></th><th>Keyboard &amp; mouse</th><th>Touch</th></tr></thead>
+          <tbody>
+            <tr><th>Walk</th><td>A D or ← →, or click a spot</td><td>tap a spot</td></tr>
+            <tr><th>Climb</th><td>W S or ↑ ↓ (walks to the ladder)</td><td>tap the floor you want</td></tr>
+            <tr><th>Work</th><td>hold Space or E; or hold the click on a machine</td><td>hold WORK, or hold a machine</td></tr>
+            <tr><th>Crank</th><td>press Space in the green</td><td>tap WORK in the green</td></tr>
+            <tr><th>Pause</th><td>Esc or P</td><td>the pause button</td></tr>
+            <tr><th>Sound</th><td>M</td><td>the speaker button</td></tr>
+          </tbody>
+        </table>
+        <div class="btn-row"><button type="button" class="btn" data-close>Back</button></div>
+      </div>
+    </div>
+
+    <!-- pause -->
+    <div class="screen pause" id="scr-pause" hidden role="dialog" aria-labelledby="pause-h">
+      <div class="card">
+        <h2 id="pause-h">Paused <small id="pause-at">at 22:00</small></h2>
+        <p>The storm waits for you. Nothing thaws while you're away.</p>
+        <div class="btn-row">
+          <button type="button" class="btn primary" id="btn-resume">Resume</button>
+          <button type="button" class="btn ghost" id="btn-restart">Restart the night</button>
+          <button type="button" class="btn ghost" id="btn-quit">Title</button>
+        </div>
+        <p class="binder-cue dark"><a href="#binder" data-open-binder>The studio binder</a>: how this night was made.</p>
+        <div class="toggles">
+          <button type="button" class="toggle" data-setting="sound" aria-pressed="true">Sound</button>
+          <button type="button" class="toggle" data-setting="lowFx" aria-pressed="false">Reduce flashing</button>
+        </div>
+        <table class="controls" style="margin-top:14px">
+          <tbody>
+            <tr><th>Walk</th><td>A D / ← → · click · tap</td></tr>
+            <tr><th>Climb</th><td>W S / ↑ ↓ · tap another floor</td></tr>
+            <tr><th>Work</th><td>hold Space / E · hold WORK · hold a machine</td></tr>
+            <tr><th>Crank</th><td>press in the green, three times</td></tr>
+            <tr><th>Pause · Sound</th><td>Esc / P · M</td></tr>
+          </tbody>
+        </table>
+        <p class="fine">Made with the <a href="https://github.com/Donchitos/Claude-Code-Game-Studios" target="_blank" rel="noopener">Claude Code Game Studios</a> workflow (MIT). Type: Big Shoulders Stencil and Martian Mono (SIL OFL).</p>
+      </div>
+    </div>
+
+    <!-- end of the night -->
+    <div class="screen end" id="end" hidden role="dialog" aria-labelledby="end-title">
+      <div class="card end-card">
+        <h2 id="end-title" data-k="title">Dawn at Hesper Fell</h2>
+        <p class="end-line" data-k="line"></p>
+        <p class="end-score"><b data-k="score">0</b> <span data-k="scorelabel">accessions saved</span></p>
+        <ul class="end-bays" data-k="bays"></ul>
+        <ul class="end-stats" data-k="stats"></ul>
+        <p class="end-best">Best night: <b data-k="best">none yet</b> · Seed <b data-k="seed"></b></p>
+        <div class="btn-row">
+          <button type="button" class="btn primary" data-k="again">Play again</button>
+          <button type="button" class="btn ghost" data-k="totitle">Title</button>
+        </div>
+        <p class="binder-cue dark"><a href="#binder" data-open-binder>Read the studio binder</a></p>
+      </div>
+    </div>
+
+    <div class="sr-only" id="sr" aria-live="polite"></div>
+    <a class="scroll-cue" href="#binder" aria-label="Scroll to the studio binder">The studio binder <span aria-hidden="true">↓</span></a>
+  </section>
+  <section class="binder" id="binder" aria-labelledby="binder-title">
+    <noscript><p style="padding:24px">The studio binder needs JavaScript to lay out its pages. The documents themselves are plain Markdown in the <a href="studio/">studio</a> folder.</p></noscript>
+  </section>
+</main>
+<script src="game.js"></script>
+<script src="binder-docs.js"></script>
+<script src="binder.js"></script>
+<script src="../../shared/tag.js" data-no="01" data-slug="01-claude-code-game-studios" data-tool="Claude Code Game Studios" data-position="bl" defer></script>
+</body>
+</html>
